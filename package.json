@@ -51,7 +51,10 @@
   },
   "dependencies": {
     "debug": "2.5.1",
-    "feathers-errors": "2.5.0"
+    "feathers": "2.0.3",
+    "feathers-errors": "2.5.0",
+    "feathers-nedb": "2.6.0",
+    "nedb": "1.8.0"
   },
   "devDependencies": {
     "babel-cli": "6.18.0",
