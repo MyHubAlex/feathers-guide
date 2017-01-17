@@ -5,9 +5,9 @@ feathersClient
     storage: window.localStorage
   }));
 
-const teams = feathersClients.service('/teams');
+const teams = feathersClient.service('/teams');
 
-feathersClients.authenticate({
+feathersClient.authenticate({
   type: 'local',
   'email': 'jane.doe@gmail.com',
   'password': '11111'
