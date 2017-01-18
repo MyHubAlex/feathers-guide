@@ -1,18 +1,17 @@
 
-PART 2 - Feathers Patterns
-
-- See, I'm doing this thing
+GUIDES - TO DO
+- Adapters
     - When a service call just isn't enough
     - Adapter for Redux
     - Adapter for Angular2 (?)
-    - Adapter for Vue2 (?) 
+    - Adapter for Vue2
         - ? https://github.com/t2t2/vue-syncers-feathers
         - https://feathersjs.slack.com/messages/help/files/F3HMXTN72/
-- Let's get awesome
-    - client input ("The client is mostly right")
+- Client extensions for service calls
+    - client input
         - $client
         - clients telling servers how to populate and serialize
-- There's more to life than tables
+- Non-DB services 
     - custom services
     - first example see (1) below
         - example swagger service
@@ -20,17 +19,17 @@ PART 2 - Feathers Patterns
         - info for a dashboard
     - proxy services
         - example
-- I said client, not frontend
+- The server as a client
     - convert proxy example so proxy server starts a feathers-client to another server
         - define services at the frontend,
         - write hooks for them,
         - make them communicate with backend services if needed.
-- Did I say server? I meant frontend
+- The client behaving as a server
     - hooks on clients
     - custom services on client
     - caching on client
     - local copy of part of DB (?)
-- Let's get serious
+- Authentication
     - authentication
         - multiple examples of authentications
     - permissions
@@ -39,10 +38,7 @@ PART 2 - Feathers Patterns
         - feathers-authentication-management
 - maybe deployment
 
-
-
-
-(1) custom service example #1
+(1) custom service example #1 from daffl
 app.use('/todos', {
   get(id) {
     return Promise.resolve({
@@ -54,5 +50,4 @@ app.use('/todos', {
 
 
 Notes:
-- feathers-hooks-common needs fix in iffElse
 - Need ValidateSchema package. Remove stubs from sample code.
