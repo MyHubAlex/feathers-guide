@@ -1,5 +1,7 @@
 # feathers-guide
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/feathersjs/feathers-guide.svg)](https://greenkeeper.io/)
+
 ## Installing the guides and examples
 
 #### Install Node
