@@ -692,35 +692,37 @@
 <h2 id="issues">Issues</h2>
 <p><strong>Probably should remove this.</strong></p>
 <p>One database per customer is logically reasonable for many mobile applications as customers don&apos;t interact in such applications.
-However a successful application may end up having thousands of databases, one for each of its thousands oft customers.
-You can use tools, such as those provided by IBM, which maintain only one database but make it look like many indivisual CouchDB databases.</p>
+However a successful application may end up having thousands of databases, one for each of its thousands of customers.
+You can use tools, such as those provided by IBM, which maintain only one database but makes it look like many individual CouchDB databases.</p>
 <p>A second issue is that the remote and local databases synchronize by replication.
 The only way to make replication realtime is to start a synchronization cycle every time any data changes on either the remote of the local database.
-This is prohibitory.</p>
+This is a lot of overhead.</p>
 <h2 id="feathers-offline-first">Feathers Offline First</h2>
 <p>Feathers has unique foundational features which are useful for implementing offline-first.</p>
 <p>First, local applications can easily mutate remote databases.
 This means we can add a hook to a local database so that, whenever it is locally mutated, the hook can optimistically mutate the remote database.</p>
-<p>Second, local applications are know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.</p>
+<p>Second, local applications know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.</p>
 <p>Feathers Offline First therefore reacts in realtime when connected, employing a replication strategy only when disconnected.
 This makes applications using it less sluggish.</p>
+<p>Importantly, Feathers Offline First allows a client database to reflect only a portion of the remote database.
+So information for all customers can reside in one database, with each client seeing only those items its allowed to.</p>
 <h2 id="no-universal-solution">No universal solution</h2>
-<p>There is no universal solution to implementing offline first. The end.</p>
+<p>There is no one universal solution to implementing offline first. The end.</p>
 <p>For each application, you have to:</p>
 <ul>
 <li>asses the problem</li>
 <li>determine the correct solution</li>
-<li>find the right code</li>
+<li>implement the right code</li>
 </ul>
 <blockquote>
 <p>In this order please!</p>
 </blockquote>
 <p>Many mobile applications only need a read-only local database which is infrequently refreshed.
-Why in such cases would you implement a complex replication strategy?</p>
+Why would you implement a complex replication strategy in such cases?</p>
 <p>Feathers Offline First provides 7 different strategies for implementing offline first.
-Determine your application&apos;s needs and then choose the simplest strategy satisfying those needs.</p>
+Determine your application&apos;s needs and then choose the simplest strategy which satisfies them.</p>
 <h2 id="strategy-features">Strategy Features</h2>
-<p>Feathers Offline First provides 7 increasingly sophisticated strategies for you to choose from.
+<p>Feathers Offline First provides 7 increasingly sophisticated strategies.
 Its generally straightforward to change you application to use a more sophisticated one (except for snapshot).</p>
 <p>The features for each strategy are shown below.</p>
 <table>
@@ -1017,7 +1019,7 @@ Its generally straightforward to change you application to use a more sophistica
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Offline","level":"1.5","depth":1,"next":{"title":"Features","level":"1.5.1","depth":2,"path":"offline/features.md","ref":"offline/features.md","articles":[]},"previous":{"title":"Redux for Feathers authentication >>","level":"1.4.2","depth":2,"path":"adapters/redux-auth/readme.md","ref":"adapters/redux-auth/readme.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/readme.md","mtime":"2017-04-27T18:40:46.760Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-27T18:40:55.445Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Offline","level":"1.5","depth":1,"next":{"title":"Features","level":"1.5.1","depth":2,"path":"offline/features.md","ref":"offline/features.md","articles":[]},"previous":{"title":"Redux for Feathers authentication >>","level":"1.4.2","depth":2,"path":"adapters/redux-auth/readme.md","ref":"adapters/redux-auth/readme.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/readme.md","mtime":"2017-04-27T18:54:09.352Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-27T18:54:46.856Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

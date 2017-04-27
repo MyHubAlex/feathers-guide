@@ -47,12 +47,12 @@ In this architecture, both the client and the server can make changes to the dat
 **Probably should remove this.**
 
 One database per customer is logically reasonable for many mobile applications as customers don't interact in such applications.
-However a successful application may end up having thousands of databases, one for each of its thousands oft customers.
-You can use tools, such as those provided by IBM, which maintain only one database but make it look like many indivisual CouchDB databases.
+However a successful application may end up having thousands of databases, one for each of its thousands of customers.
+You can use tools, such as those provided by IBM, which maintain only one database but makes it look like many individual CouchDB databases.
 
 A second issue is that the remote and local databases synchronize by replication.
 The only way to make replication realtime is to start a synchronization cycle every time any data changes on either the remote of the local database.
-This is prohibitory.
+This is a lot of overhead.
 
 ## Feathers Offline First
 
@@ -61,31 +61,34 @@ Feathers has unique foundational features which are useful for implementing offl
 First, local applications can easily mutate remote databases.
 This means we can add a hook to a local database so that, whenever it is locally mutated, the hook can optimistically mutate the remote database.
 
-Second, local applications are know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.
+Second, local applications know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.
 
 Feathers Offline First therefore reacts in realtime when connected, employing a replication strategy only when disconnected.
 This makes applications using it less sluggish.
 
+Importantly, Feathers Offline First allows a client database to reflect only a portion of the remote database.
+So information for all customers can reside in one database, with each client seeing only those items its allowed to.
+
 ## No universal solution
 
-There is no universal solution to implementing offline first. The end.
+There is no one universal solution to implementing offline first. The end.
 
 For each application, you have to:
 - asses the problem
 - determine the correct solution
-- find the right code
+- implement the right code
 
 > In this order please!
 
 Many mobile applications only need a read-only local database which is infrequently refreshed.
-Why in such cases would you implement a complex replication strategy?
+Why would you implement a complex replication strategy in such cases?
 
 Feathers Offline First provides 7 different strategies for implementing offline first.
-Determine your application's needs and then choose the simplest strategy satisfying those needs.
+Determine your application's needs and then choose the simplest strategy which satisfies them.
 
 ## Strategy Features
 
-Feathers Offline First provides 7 increasingly sophisticated strategies for you to choose from.
+Feathers Offline First provides 7 increasingly sophisticated strategies.
 Its generally straightforward to change you application to use a more sophisticated one (except for snapshot).
 
 The features for each strategy are shown below.
