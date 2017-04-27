@@ -681,7 +681,7 @@
 </thead>
 <tbody>
 <tr>
-<td>Select table contents to replicate</td>
+<td><strong>Select remote items to replicate</strong></td>
 <td>Y</td>
 <td>Y</td>
 <td>Y</td>
@@ -691,7 +691,7 @@
 <td></td>
 </tr>
 <tr>
-<td>- <em>Selection by query syntax</em></td>
+<td>- Using query syntax</td>
 <td>Y</td>
 <td>Y</td>
 <td>Y</td>
@@ -701,7 +701,7 @@
 <td></td>
 </tr>
 <tr>
-<td>- <em>Selection by JS function</em></td>
+<td>- Using JS functions</td>
 <td>opt2</td>
 <td>opt2</td>
 <td>opt2</td>
@@ -711,7 +711,7 @@
 <td></td>
 </tr>
 <tr>
-<td>Copy remote data at start</td>
+<td><strong>Replicate to client service</strong></td>
 <td>Y</td>
 <td>Y</td>
 <td>Y</td>
@@ -721,7 +721,67 @@
 <td></td>
 </tr>
 <tr>
-<td>Remote changes mutate local in realtime</td>
+<td>- feathers-nedb</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+</tr>
+<tr>
+<td>- feathers-memory</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td></td>
+</tr>
+<tr>
+<td>- feathers-localStorage</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Replicate to data store</strong></td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td>tba</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Copy remote data at startup</strong></td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Remote changes mutate client in realtime</strong></td>
 <td></td>
 <td>Y</td>
 <td>Y</td>
@@ -731,7 +791,7 @@
 <td></td>
 </tr>
 <tr>
-<td>- <em>Emit minimum number of events</em></td>
+<td>- Minimize events sent</td>
 <td></td>
 <td>opt2</td>
 <td>opt2</td>
@@ -741,7 +801,7 @@
 <td></td>
 </tr>
 <tr>
-<td>Local changes mutate remote in realtime</td>
+<td><strong>Client changes mutate remote in realtime</strong></td>
 <td></td>
 <td></td>
 <td>Y</td>
@@ -751,7 +811,7 @@
 <td></td>
 </tr>
 <tr>
-<td>Offline queue while disconnected</td>
+<td><strong>Offline queue while disconnected</strong></td>
 <td></td>
 <td></td>
 <td>Y</td>
@@ -761,7 +821,7 @@
 <td></td>
 </tr>
 <tr>
-<td>- <em>Queue contains every service call</em></td>
+<td>- Keep every call</td>
 <td></td>
 <td></td>
 <td>Y</td>
@@ -771,7 +831,7 @@
 <td></td>
 </tr>
 <tr>
-<td>- <em>Queue contains item net change</em></td>
+<td>- Only item net change</td>
 <td></td>
 <td></td>
 <td></td>
@@ -781,7 +841,7 @@
 <td></td>
 </tr>
 <tr>
-<td>Handle offline events on reconnection</td>
+<td><strong>Process offline queue on reconnection</strong></td>
 <td></td>
 <td></td>
 <td>Y</td>
@@ -791,7 +851,7 @@
 <td></td>
 </tr>
 <tr>
-<td>- <em>Conflict resolution handling</em></td>
+<td>- Conflict resolution handling</td>
 <td></td>
 <td></td>
 <td></td>
@@ -801,7 +861,7 @@
 <td></td>
 </tr>
 <tr>
-<td>Copy remote data on reconnect</td>
+<td><strong>Copy remote data on reconnect</strong></td>
 <td></td>
 <td></td>
 <td>opt1</td>
@@ -811,7 +871,17 @@
 <td></td>
 </tr>
 <tr>
-<td>Regular edition</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Regular edition</strong></td>
 <td>Y</td>
 <td>Y</td>
 <td>Y</td>
@@ -821,7 +891,7 @@
 <td></td>
 </tr>
 <tr>
-<td>Enterprise edition</td>
+<td><strong>Enterprise edition</strong></td>
 <td>Y</td>
 <td>Y</td>
 <td>Y</td>
@@ -834,7 +904,7 @@
 </table>
 <ul>
 <li><strong>opt1</strong> Programmatically selectable.</li>
-<li><strong>opt2</strong> Enterprise edition.</li>
+<li><strong>opt2</strong> Enterprise edition (tba).</li>
 </ul>
 
                                 
@@ -875,7 +945,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Features","level":"1.5.1","depth":2,"previous":{"title":"Offline","level":"1.5","depth":1,"path":"offline/readme.md","ref":"offline/readme.md","articles":[{"title":"Features","level":"1.5.1","depth":2,"path":"offline/features.md","ref":"offline/features.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/features.md","mtime":"2017-04-27T13:44:40.437Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-27T13:44:57.433Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Features","level":"1.5.1","depth":2,"previous":{"title":"Offline","level":"1.5","depth":1,"path":"offline/readme.md","ref":"offline/readme.md","articles":[{"title":"Features","level":"1.5.1","depth":2,"path":"offline/features.md","ref":"offline/features.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/features.md","mtime":"2017-04-27T14:29:56.398Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-27T14:30:07.830Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
