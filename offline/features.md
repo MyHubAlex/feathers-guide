@@ -16,7 +16,7 @@
 |                                              |           |           |          |         |           |          |             |
 | **Copy remote data at startup**              | Y         | Y         | Y        | Y       | Y         | Y        |             |
 | **Remote changes mutate client in realtime** |           | Y         | Y        | Y       | Y         | Y        |             |
-| - Minimize events sent                   |           | opt2      | opt2     | opt2    | opt2      | opt2     |             |
+| - Minimize events sent                       |           | opt2      | opt2     | opt2    | opt2      | opt2     |             |
 | **Client changes mutate remote in realtime** |           |           | Y        | Y       | Y         | Y        |             |
 | **Offline queue while disconnected**         |           |           | Y        | Y       | Y         | Y        |             |
 | - Keep every call                            |           |           | Y        |         | Y         |          |             |
