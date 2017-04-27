@@ -12,6 +12,7 @@
 | - feathers-memory                            | tba       | tba       | tba      | tba     | tba       | tba      |             |
 | - feathers-localStorage                      | tba       | tba       | tba      | tba     | tba       | tba      |             |
 | **Replicate to data store**                  | tba       | tba       | tba      | tba     | tba       | tba      |             |
+| **Is a uuid field required?**                |           |           | Y        | Y       | Y         | Y        |             |
 |                                              |           |           |          |         |           |          |             |
 | **Copy remote data at startup**              | Y         | Y         | Y        | Y       | Y         | Y        |             |
 | **Remote changes mutate client in realtime** |           | Y         | Y        | Y       | Y         | Y        |             |
