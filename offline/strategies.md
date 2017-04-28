@@ -1,5 +1,11 @@
-# Offline Strategy Features
+# Strategies
 
+## Comparison of Strategies
+
+Feathers Offline First provides 7 increasingly sophisticated strategies.
+Its generally straightforward to change you application to use a more sophisticated one (except for snapshot).
+
+The features for each strategy are shown below.
 
 
 | Feature                                      | snap shot | real time | own-data | own-net | sync-data | sync-net | time-travel |
@@ -30,3 +36,7 @@
 
 - **opt1** Programmatically selectable.
 - **opt2** Enterprise edition (tba).
+
+
+(*) Source [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
+ 

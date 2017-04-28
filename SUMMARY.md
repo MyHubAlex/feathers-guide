@@ -37,4 +37,4 @@
     * [Redux for Feathers services >>](adapters/redux-services/readme.md)
     * [Redux for Feathers authentication >>](adapters/redux-auth/readme.md)
 * [Offline](offline/readme.md)
-    * [Features](offline/features.md)
+    * [Strategies](offline/strategies.md)
