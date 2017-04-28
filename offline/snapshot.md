@@ -1,6 +1,6 @@
 # Snapshot
 
-## What is the Snapshot offline strategy?
+## What is the Snapshot strategy?
 
 Snapshot distributes data exactly as it appears at a specific moment in time and does not monitor for updates to the data.
 When synchronization occurs, the entire snapshot is generated and sent to client service.
@@ -53,10 +53,13 @@ The problem definition contains the solution:
 
 ![Cinema flowchart](./assets/snapshot-2d.jpg)
 
+The snapshot strategy is the simplest one to satisfy the needs.
+
 How about ticket reservations? You got to do some things online!
 However, you can still give a telephone number.
 
+(**)
 
-Sources:
+#### Sources:
 - (*) [Microsoft](https://docs.microsoft.com/en-us/sql/relational-databases/replication/snapshot-replication)
 - (**) [MarinTodorov](https://www.slideshare.net/MarinTodorov/overcome-your-fear-of-implementing-offline-mode-in-your-apps?next_slideshow=1)

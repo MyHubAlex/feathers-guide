@@ -8,7 +8,11 @@ However, mobile networks are still known to be unreliable. Even in highly covere
 
 In one extreme end of the quality spectrum, you have an application that, when a network error occurs, the application presents the user with a crude error message and no clue of how to recover.
 
+![no connection](./assets/no-connection-1.jpg)
+
 On the opposite end of the spectrum are applications that automatically deal with network failures — this is the good end of the spectrum.
+
+![offline panel](./assets/snapshot-4e.jpg)
 
 (*)
 
@@ -28,8 +32,6 @@ Your application prefers reading from the local source, while that local data is
 
 ## The First Generation of Offline First (*)
 
-**Probably should remove this.**
-
 Some database technologies exist that work on the client side. SQLite is the reference of embeddable databases and it’s often used on native applications. In the web realm, PouchDB offers a document store on top of the storage the browser offers. PouchDB also has some nice features —  it can sync with a back-end CouchDB server, Cloudant, a PouchDB Node.js server or any other database that implements the CouchDB replication protocol.
 
 In this architecture, each client has its own dedicated database, which is then replicated to a dedicated database on the back-end. Each database may then contain the customer documents. (A document is a JSON object that may contain any arbitrary data).
@@ -44,15 +46,13 @@ In this architecture, both the client and the server can make changes to the dat
 
 ## Issues
 
-**Probably should remove this.**
-
 One database per customer is logically reasonable for many mobile applications as customers don't interact in such applications.
 However a successful application may end up having thousands of databases, one for each of its thousands of customers.
 You can use tools, such as those provided by IBM, which maintain only one database but makes it look like many individual CouchDB databases.
 
 A second issue is that the remote and local databases synchronize by replication.
 The only way to make replication realtime is to start a synchronization cycle every time any data changes on either the remote of the local database.
-This is a lot of overhead.
+This is a lot of overhead especially on the server.
 
 ## Feathers Offline First
 
@@ -62,6 +62,8 @@ First, local applications can easily mutate remote databases.
 This means we can add a hook to a local database so that, whenever it is locally mutated, the hook can optimistically mutate the remote database.
 
 Second, local applications know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.
+
+![realtime events](./assets/realtime-events-flow.jpg)
 
 Feathers Offline First therefore reacts in realtime when connected, employing a replication strategy only when disconnected.
 This makes applications using it less sluggish.
@@ -86,4 +88,5 @@ Why would you implement a complex replication strategy in such cases?
 Feathers Offline First provides several strategies for implementing offline first.
 Determine your application's needs and then choose the simplest strategy which satisfies them.
 
-(*) Source [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
+#### Sources:
+-(*) [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
