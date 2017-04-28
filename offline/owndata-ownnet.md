@@ -16,7 +16,9 @@ It may, for example, run hooks which send emails on certain mutations.
 own-net queues the net change for each record.
 If a record is patched 5 times, own-net queues the record contents after the last of the changes.
 If a record created, patched and finally removed, the remote service will not see the mutations at all.
-own-net reduces the load on the remote service. 
+own-net reduces the load on the remote service.
+
+Once the queue is processed, a snapshot refreshes the client service's data.
 
 ## Last Mutation Wins Strategy
 
