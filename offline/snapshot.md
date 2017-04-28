@@ -61,5 +61,6 @@ However, you can still give a telephone number.
 (**)
 
 #### Sources:
+
 - (*) [Microsoft](https://docs.microsoft.com/en-us/sql/relational-databases/replication/snapshot-replication)
 - (**) [MarinTodorov](https://www.slideshare.net/MarinTodorov/overcome-your-fear-of-implementing-offline-mode-in-your-apps?next_slideshow=1)

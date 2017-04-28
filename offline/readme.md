@@ -61,6 +61,8 @@ Feathers has unique foundational features which are useful for implementing offl
 First, local applications can easily mutate remote databases.
 This means we can add a hook to a local database so that, whenever it is locally mutated, the hook can optimistically mutate the remote database.
 
+![services](./assets/service-diagram-basic.jpg)
+
 Second, local applications know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.
 
 ![realtime events](./assets/realtime-events-flow.jpg)
@@ -89,4 +91,5 @@ Feathers Offline First provides several strategies for implementing offline firs
 Determine your application's needs and then choose the simplest strategy which satisfies them.
 
 #### Sources:
--(*) [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
+
+- (*) [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
