@@ -720,6 +720,7 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="own-data-and-own-net">Own-data and own-net</h1>
+<h2 id="what-is-the-own-data-and-own-net-strategy">What is the own-data and own-net strategy?</h2>
 <p>The core data for many mobile applications is unique to the user using the application.
 Since no one other than the user can change that user&apos;s data,
 the client can safely mutate the remote data without concern that anyone is doing the same at that same time.</p>
@@ -732,6 +733,24 @@ It may, for example, run hooks which send emails on certain mutations.</p>
 If a record is patched 5 times, own-net queues the record contents after the last of the changes.
 If a record created, patched and finally removed, the remote service will not see the mutations at all.
 own-net reduces the load on the remote service. </p>
+<h2 id="last-mutation-wins-strategy">Last Mutation Wins Strategy</h2>
+<p>The own-data and own-net strategies can be viable even when multiple clients may be mutation the same records.
+All that will happen is the last mutation made by any client will replace the remote service&apos;s record.
+This may be acceptable in some use cases.</p>
+<h2 id="own-data-case-study">own-data Case Study</h2>
+<p>The realtime case study involved displaying historical stock prices.
+Let&apos;s now allow the user to buy shares for his own portfolio.</p>
+<p><img src="assets/realtime-3a.jpg" alt="own start"></p>
+<p>The user will be disconnected if he takes a plane trip,
+and he will no longer receive stock price updates.</p>
+<p><img src="assets/realtime-3c.jpg" alt="on plane"></p>
+<p>However he can still make stock purchases.
+They will be sent to the server when he reconnects after landing.</p>
+<p><img src="assets/realtime-3d.jpg" alt="time line"></p>
+<h4 id="sources">Sources:</h4>
+<ul>
+<li>(**) <a href="https://www.slideshare.net/MarinTodorov/overcome-your-fear-of-implementing-offline-mode-in-your-apps?next_slideshow=1" target="_blank">MarinTodorov</a></li>
+</ul>
 
                                 
                                 </section>
@@ -775,7 +794,7 @@ own-net reduces the load on the remote service. </p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"owndata-ownnet","level":"1.5.4","depth":2,"next":{"title":"syncdata-syncnet","level":"1.5.5","depth":2,"path":"offline/syncdata-syncnet.md","ref":"offline/syncdata-syncnet.md","articles":[]},"previous":{"title":"realtime","level":"1.5.3","depth":2,"path":"offline/realtime.md","ref":"offline/realtime.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/owndata-ownnet.md","mtime":"2017-04-28T14:32:11.776Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-28T15:32:41.614Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"owndata-ownnet","level":"1.5.4","depth":2,"next":{"title":"syncdata-syncnet","level":"1.5.5","depth":2,"path":"offline/syncdata-syncnet.md","ref":"offline/syncdata-syncnet.md","articles":[]},"previous":{"title":"realtime","level":"1.5.3","depth":2,"path":"offline/realtime.md","ref":"offline/realtime.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/owndata-ownnet.md","mtime":"2017-04-28T16:05:20.991Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-28T16:05:27.432Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
