@@ -40,4 +40,7 @@
     * [Strategies](offline/strategies.md)
     * [snapshot](offline/snapshot.md)
     * [realtime](offline/realtime.md)
+    * [owndata-ownnet](offline/owndata-ownnet.md)
+    * [syncdata-syncnet](offline/syncdata-syncnet.md)
+    
     
