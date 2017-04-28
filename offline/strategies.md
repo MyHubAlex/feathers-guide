@@ -36,7 +36,3 @@ The features for each strategy are shown below.
 
 - **opt1** Programmatically selectable.
 - **opt2** Enterprise edition (tba).
-
-
-(*) Source [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
- 

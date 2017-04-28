@@ -38,3 +38,4 @@
     * [Redux for Feathers authentication >>](adapters/redux-auth/readme.md)
 * [Offline](offline/readme.md)
     * [Strategies](offline/strategies.md)
+    * [snapshot](offline/snapshot.md)

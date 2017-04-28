@@ -85,3 +85,5 @@ Why would you implement a complex replication strategy in such cases?
 
 Feathers Offline First provides several strategies for implementing offline first.
 Determine your application's needs and then choose the simplest strategy which satisfies them.
+
+(*) Source [Pedro Teixeira](https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/)
