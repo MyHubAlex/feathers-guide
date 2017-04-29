@@ -1,5 +1,7 @@
 # sync-data and sync-net
 
+## What are the sync-data and sync-net strategies?
+
 More complex applications may allow multiple users to mutate the same data on the remote service.
 sync-data and sync-net are similar to own-data and own-net, however they detect mutation conflicts
 and help the server resolve them.
@@ -40,3 +42,36 @@ However, in your particular use case, it may be appropriate to adapt as last-mut
 and also use the client service's mutation.
 
 Other use cases may require analyzing the contents of the two records and applying business rules.
+
+## Sometimes own-data is sufficient
+
+Let's say a portion of your [Neighborhood Watch](https://en.wikipedia.org/wiki/Neighborhood_watch) app
+allows residents to report the location of a suspect in realtime,
+while the neighborhood waits for law enforcement to arrive.
+Your app may allow update the suspect's location by using the mobile's geolocation.
+
+![neighborhood watch geolocation](./assets/watch-1a.jpg)
+
+You may decide, after assessing the application and legal requirements,
+to maintain one record for the suspect which contains only his latest location.
+All your clients will be updating this one record.
+
+In this use case, you might not care about detecting mutation conflicts among the various clients.
+The app just cares about the latest sighting.
+
+![neighborhood watch mutations](./assets/watch-1c.jpg)
+
+You have two choices.
+- You could use the sync-data strategy with the conflict resolver always choosing
+the client server's latest record.
+- You could use the own-data strategy and let the client mutations update over one another naturally.
+
+## Keep things simple
+
+You don't always have to choose the most sophisticated strategy.
+Its harder to reason about designs which are more sophisticated.
+There is a greater possibility of introducing errors.
+It requires a software maintainer understand more things before working with the code.
+Finally, in this case, it increases the processing load on both the server and the client. 
+
+Sometimes the best course is to choose the simplest strategy which addresses the needs.

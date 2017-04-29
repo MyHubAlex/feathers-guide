@@ -1,6 +1,6 @@
 # Own-data and own-net
 
-## What is the own-data and own-net strategy?
+## What are the own-data and own-net strategies?
 
 The core data for many mobile applications is unique to the user using the application.
 Since no one other than the user can change that user's data,
@@ -19,12 +19,6 @@ If a record created, patched and finally removed, the remote service will not se
 own-net reduces the load on the remote service.
 
 Once the queue is processed, a snapshot refreshes the client service's data.
-
-## Last Mutation Wins Strategy
-
-The own-data and own-net strategies can be viable even when multiple clients may be mutation the same records.
-All that will happen is the last mutation made by any client will replace the remote service's record.
-This may be acceptable in some use cases.
 
 ## own-data Case Study
 

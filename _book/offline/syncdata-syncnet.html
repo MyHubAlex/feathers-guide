@@ -718,6 +718,7 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="sync-data-and-sync-net">sync-data and sync-net</h1>
+<h2 id="what-are-the-sync-data-and-sync-net-strategies">What are the sync-data and sync-net strategies?</h2>
 <p>More complex applications may allow multiple users to mutate the same data on the remote service.
 sync-data and sync-net are similar to own-data and own-net, however they detect mutation conflicts
 and help the server resolve them.</p>
@@ -753,6 +754,31 @@ The mutation from <code>100 Lexington</code> to <code>123 Fifth Avenue</code> co
 However, in your particular use case, it may be appropriate to adapt as last-mutation-wins strategy
 and also use the client service&apos;s mutation.</p>
 <p>Other use cases may require analyzing the contents of the two records and applying business rules.</p>
+<h2 id="sometimes-own-data-is-sufficient">Sometimes own-data is sufficient</h2>
+<p>Let&apos;s say a portion of your <a href="https://en.wikipedia.org/wiki/Neighborhood_watch" target="_blank">Neighborhood Watch</a> app
+allows residents to report the location of a suspect in realtime,
+while the neighborhood waits for law enforcement to arrive.
+Your app may allow update the suspect&apos;s location by using the mobile&apos;s geolocation.</p>
+<p><img src="assets/watch-1a.jpg" alt="neighborhood watch geolocation"></p>
+<p>You may decide, after assessing the application and legal requirements,
+to maintain one record for the suspect which contains only his latest location.
+All your clients will be updating this one record.</p>
+<p>In this use case, you might not care about detecting mutation conflicts among the various clients.
+The app just cares about the latest sighting.</p>
+<p><img src="assets/watch-1c.jpg" alt="neighborhood watch mutations"></p>
+<p>You have two choices.</p>
+<ul>
+<li>You could use the sync-data strategy with the conflict resolver always choosing
+the client server&apos;s latest record.</li>
+<li>You could use the own-data strategy and let the client mutations update over one another naturally.</li>
+</ul>
+<h2 id="keep-things-simple">Keep things simple</h2>
+<p>You don&apos;t always have to choose the most sophisticated strategy.
+Its harder to reason about designs which are more sophisticated.
+There is a greater possibility of introducing errors.
+It requires a software maintainer understand more things before working with the code.
+Finally, in this case, it increases the processing load on both the server and the client. </p>
+<p>Sometimes the best course is to choose the simplest strategy which addresses the needs.</p>
 
                                 
                                 </section>
@@ -792,7 +818,7 @@ and also use the client service&apos;s mutation.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"syncdata-syncnet","level":"1.5.5","depth":2,"previous":{"title":"owndata-ownnet","level":"1.5.4","depth":2,"path":"offline/owndata-ownnet.md","ref":"offline/owndata-ownnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/syncdata-syncnet.md","mtime":"2017-04-28T15:10:25.765Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-28T16:09:36.591Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"syncdata-syncnet","level":"1.5.5","depth":2,"previous":{"title":"owndata-ownnet","level":"1.5.4","depth":2,"path":"offline/owndata-ownnet.md","ref":"offline/owndata-ownnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/syncdata-syncnet.md","mtime":"2017-04-29T17:01:14.921Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-29T17:02:28.571Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
