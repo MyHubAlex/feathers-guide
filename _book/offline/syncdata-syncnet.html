@@ -758,19 +758,21 @@ and also use the client service&apos;s mutation.</p>
 <p>Let&apos;s say a portion of your <a href="https://en.wikipedia.org/wiki/Neighborhood_watch" target="_blank">Neighborhood Watch</a> app
 allows residents to report the location of a suspect in realtime,
 while the neighborhood waits for law enforcement to arrive.
-Your app may allow update the suspect&apos;s location by using the mobile&apos;s geolocation.</p>
+Your app may allow residents to update the suspect&apos;s location by using the mobile&apos;s geolocation.</p>
 <p><img src="assets/watch-1a.jpg" alt="neighborhood watch geolocation"></p>
-<p>You may decide, after assessing the application and legal requirements,
-to maintain one record for the suspect which contains only his latest location.
-All your clients will be updating this one record.</p>
-<p>In this use case, you might not care about detecting mutation conflicts among the various clients.
+<p>You may decide, after assessing the application needs and legal requirements,
+to maintain only one record which contains only the suspect&apos;s latest location.
+All the residents will be updating this one record.</p>
+<p>In this use case, although many clients are updating the same record,
+you might not care about detecting mutation conflicts among the various clients.
 The app just cares about the latest sighting.</p>
 <p><img src="assets/watch-1c.jpg" alt="neighborhood watch mutations"></p>
 <p>You have two choices.</p>
 <ul>
 <li>You could use the sync-data strategy with the conflict resolver always choosing
-the client server&apos;s latest record.</li>
-<li>You could use the own-data strategy and let the client mutations update over one another naturally.</li>
+the client services&apos;s latest record, or</li>
+<li>You could use the own-data strategy and let the client mutations update over one another
+based solely on when the clients do the mutation.</li>
 </ul>
 <h2 id="keep-things-simple">Keep things simple</h2>
 <p>You don&apos;t always have to choose the most sophisticated strategy.
@@ -818,7 +820,7 @@ Finally, in this case, it increases the processing load on both the server and t
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"syncdata-syncnet","level":"1.5.5","depth":2,"previous":{"title":"owndata-ownnet","level":"1.5.4","depth":2,"path":"offline/owndata-ownnet.md","ref":"offline/owndata-ownnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/syncdata-syncnet.md","mtime":"2017-04-29T17:01:14.921Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-29T17:02:28.571Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"syncdata-syncnet","level":"1.5.5","depth":2,"previous":{"title":"owndata-ownnet","level":"1.5.4","depth":2,"path":"offline/owndata-ownnet.md","ref":"offline/owndata-ownnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/syncdata-syncnet.md","mtime":"2017-04-29T17:11:05.671Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-04-29T17:11:17.244Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

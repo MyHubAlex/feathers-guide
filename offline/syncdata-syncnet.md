@@ -48,23 +48,25 @@ Other use cases may require analyzing the contents of the two records and applyi
 Let's say a portion of your [Neighborhood Watch](https://en.wikipedia.org/wiki/Neighborhood_watch) app
 allows residents to report the location of a suspect in realtime,
 while the neighborhood waits for law enforcement to arrive.
-Your app may allow update the suspect's location by using the mobile's geolocation.
+Your app may allow residents to update the suspect's location by using the mobile's geolocation.
 
 ![neighborhood watch geolocation](./assets/watch-1a.jpg)
 
-You may decide, after assessing the application and legal requirements,
-to maintain one record for the suspect which contains only his latest location.
-All your clients will be updating this one record.
+You may decide, after assessing the application needs and legal requirements,
+to maintain only one record which contains only the suspect's latest location.
+All the residents will be updating this one record.
 
-In this use case, you might not care about detecting mutation conflicts among the various clients.
+In this use case, although many clients are updating the same record,
+you might not care about detecting mutation conflicts among the various clients.
 The app just cares about the latest sighting.
 
 ![neighborhood watch mutations](./assets/watch-1c.jpg)
 
 You have two choices.
 - You could use the sync-data strategy with the conflict resolver always choosing
-the client server's latest record.
-- You could use the own-data strategy and let the client mutations update over one another naturally.
+the client services's latest record, or
+- You could use the own-data strategy and let the client mutations update over one another
+based solely on when the clients do the mutation.
 
 ## Keep things simple
 
