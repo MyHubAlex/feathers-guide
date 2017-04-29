@@ -11,7 +11,7 @@ https://www.slideshare.net/MarinTodorov/overcome-your-fear-of-implementing-offli
 There is no universal solution
 THE END
 
-- asses the problem
+- assess the problem
 - evaluate the solution
 - code
 in this order please!

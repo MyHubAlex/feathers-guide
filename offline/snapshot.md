@@ -35,7 +35,7 @@ Let's consider a mobile application for movie cinemas, which lists show times.
 
 ![Cinema panels](./assets/snapshot-2a.jpg)
 
-Let's asses the data problem.
+Let's assess the data problem.
 - Cinemas change once a year.
 - The schedule changes every Thursday.
 - The static information rarely changes.

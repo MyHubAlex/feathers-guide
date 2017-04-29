@@ -78,7 +78,7 @@ So information for all customers can reside in one database, with each client se
 There is no one universal solution to implementing offline first. The end.
 
 For each application, you have to:
-- asses the problem
+- assess the problem
 - determine the correct solution
 - implement the right code
 
