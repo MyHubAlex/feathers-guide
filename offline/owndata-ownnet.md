@@ -18,7 +18,7 @@ If a record is patched 5 times, own-net queues the record contents after the las
 If a record created, patched and finally removed, the remote service will not see the mutations at all.
 own-net reduces the load on the remote service.
 
-Once the queue is processed, a snapshot refreshes the client service's data.
+> Once the queue is processed, a snapshot refreshes the client service's data.
 
 ## own-data Case Study
 
