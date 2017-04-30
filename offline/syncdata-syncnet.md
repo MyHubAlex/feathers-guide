@@ -25,6 +25,8 @@ The queued mutations will be processed once the user reconnects after his flight
 The only conflict to occur will be for the NYC office.
 The mutation from `100 Lexington` to `123 Fifth Avenue` conflicts with the record now being `123 5-th Ave.` on the remote service.
 
+![sync conflict](./assets/sync-1a.jpg)
+
 The remote service's `conflict resolver function` will be called with:
 - the remote service's current record.
 - the client service's method call, e.g. 'create', 'update', ...
@@ -32,10 +34,14 @@ The remote service's `conflict resolver function` will be called with:
 - the client service's before record.
 - the record the client service wants to mutate to.
 
+![sync conflict input](./assets/sync-1b.jpg)
+
 The resolver may indicate:
 - the current remote service's record is to be retained.
 - the remote service's record should be mutated to the client service's record.
 - what the contents of the record should now be.
+
+![sync conflict output](./assets/sync-1c.jpg)
 
 This allows the remote service great control over conflicts.
 However, in your particular use case, it may be appropriate to adapt as last-mutation-wins strategy
