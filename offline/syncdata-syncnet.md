@@ -74,6 +74,10 @@ the client services's latest record, or
 - You could use the own-data strategy and let the client mutations update over one another
 based solely on when the clients do the mutation.
 
+Whenever you decide to always use the client mutation in the conflict resolver,
+consider switching from the sync- strategy to a own- one,
+as in such cases the results are the same.
+
 ## Keep things simple
 
 You don't always have to choose the most sophisticated strategy.
@@ -82,4 +86,4 @@ There is a greater possibility of introducing errors.
 It requires a software maintainer understand more things before working with the code.
 Finally, in this case, it increases the processing load on both the server and the client. 
 
-Sometimes the best course is to choose the simplest strategy which addresses the needs.
+Often the best course is to choose the simplest strategy which addresses the needs.
