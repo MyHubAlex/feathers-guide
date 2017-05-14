@@ -66,3 +66,10 @@ data.uuid = getUuid();
 In existing databases, you will probably continue to use references to other records
 which are based on `__id` and `___id` fields.
 However you are advised to use the `uuid` field in new databases.
+
+## Don't change the configuration `id` property
+
+Feathers supports a database configuration property `id` to specify which field
+is used as the index for the `get`, `update`, `patch` and `remove` methods.
+
+**You cannot use this feature with offline-first.**
