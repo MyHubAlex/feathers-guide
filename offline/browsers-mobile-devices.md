@@ -9,5 +9,3 @@ unless they are on very slow connections.
 
 Mobile devices tend to have slow connections.
 You may want to minimize the number of service events sent them.
-
-
