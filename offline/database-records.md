@@ -32,3 +32,5 @@ The local service will have this layout using the snapshot or realtime strategie
 
 ![layout-snapshot-a-local](./assets/layout-snapshot-a-local.jpg)
 
+The remote service's `id` is renamed `__id` on the local service.
+The remote's `_id` as `___id`.
