@@ -37,3 +37,6 @@ The remote's `_id` as `___id`.
 
 If you would search the remote service for records having a specific `id` value,
 you can search the local service for that `__id` value.
+
+> **ProTip** IMPORTANT: Do not depend on the local service's `id` and `_id` values.
+They are likely to change when the client service recovers from a disconnection.
