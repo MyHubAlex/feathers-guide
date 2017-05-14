@@ -40,4 +40,3 @@ you can search the local service for that `__id` value.
 
 > **ProTip** IMPORTANT: Do not depend on the local service's `id` and `_id` values.
 They are likely to change when the client service recovers from a disconnection.
-
