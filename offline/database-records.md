@@ -24,7 +24,7 @@ Its non uncommon for records to contain the keys of other records.
 These references are retained in the local copies,
 you just have to understand how.
 
-## Snapshot and Realtime record layouts
+## Record layouts for snapshot and realtime
 
 Assume the remote service has this layout.
 
@@ -42,3 +42,27 @@ you can search the local service for that `__id` value.
 
 > **ProTip** IMPORTANT: Do not depend on the local service's `id` and `_id` values.
 They are likely to change when the client service recovers from a disconnection.
+
+## Record layouts for other strategies
+
+The remaining strategies require you have a
+[`uuid`](https://en.wikipedia.org/wiki/Universally_unique_identifier)
+field in the record layout.
+There is no avoiding this when you are capable of creating new records.
+
+The remote and local services may have these record layouts.
+
+![layout-own-data-a](./assets/layout-own-data-a.jpg)
+
+You may have to add the `uuid` field to your present layouts.
+You can generate the values with:
+
+```javascript
+const { getUuid } = require('feathers-mobile/lib/utils/hash');
+...
+data.uuid = getUuid();
+```
+
+In existing databases, you will probably continue to use references to other records
+which are based on `__id` and `___id` fields.
+However you are advised to use the `uuid` field in new databases.
