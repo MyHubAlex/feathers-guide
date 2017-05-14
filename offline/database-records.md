@@ -17,6 +17,8 @@ Some allow you to set the id when the record is bring created,
 others set the id themselves.
 
 Therefore the layout of the local database differs slightly from the remote's.
+However these will have a minimal impact on your existing database design,
+as that was one of our goals.
 
 Its non uncommon for records to contain the keys of other records.
 These references are retained in the local copies,
