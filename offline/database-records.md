@@ -34,3 +34,6 @@ The local service will have this layout using the snapshot or realtime strategie
 
 The remote service's `id` is renamed `__id` on the local service.
 The remote's `_id` as `___id`.
+
+If you would search the remote service for records having a specific `id` value,
+you can search the local service for that `__id` value.
