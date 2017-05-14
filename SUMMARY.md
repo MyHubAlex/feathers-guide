@@ -45,5 +45,6 @@
     * [Database records](offline/database-records.md)
     * [Publications](offline/publications.md)
     * [Filtering service events](offline/filtering.md)
+    * [Browsers & mobile devices](offline/browsers-mobile-devices.md)
     
     

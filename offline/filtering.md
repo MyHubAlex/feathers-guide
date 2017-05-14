@@ -90,13 +90,3 @@ That is why the replicator's `publication` option in this case
  ```
 contains the `checkBefore: false` option.
 It indicates the before record need not be checked for this publication.
-
-
-## Browsers
-
-You may want to send all service events to browser clients
-unless they are on very slow connections.
-
-## Mobile devices
-
-Mobile devices
