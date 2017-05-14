@@ -64,4 +64,13 @@ const commonPublications = require('feathers-mobile/lib/common/commonPublication
 publication: { module: commonPublications, name: 'query', params: { dept: 'acct' } }
 ```
 
-## Publications
+## Publications on the server
+
+The server is automatically aware of which publication each client is using for each remote service.
+Furthermore the server components of offline-first can configure
+[service event filters](https://docs.feathersjs.com/api/events.html#event-filtering)
+to control the events sent to each client.
+
+We can see that both the client and the server may `require` the same `publications` object.
+So its best to keep these in a directory that can be shared between the client and server code.
+That's why the `feathers-mobile/lib/common/commonPublications` path contains a `common` directory.
