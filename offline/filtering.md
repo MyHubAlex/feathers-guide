@@ -1,29 +1,30 @@
 # Filtering service events
 
-A service event is sent to the client every time the remote service is mutated,
+A service event is sent to each client every time the remote service is mutated,
 regardless of who mutated it, or how it was mutated.
 
 Consider this sequence of events:
 - The client mutates a record in the local service.
 - The replicator automatically mutates that record on the remote service.
 - That remote mutation may run hooks which further mutate the remote record,
-e.g. the `setNow` hook is used on the remote service.
+e.g. the [`setNow`](https://docs.feathersjs.com/api/hooks-common.html#setnow)
+hook is used on the remote service.
 - The service event sends the new version of the remote service to the client.
 - The replicator automatically mutates the record on the local service to match the remote's.
 
 You need all these messages if you are replicating the whole database.
-However wouldn't you want to minimize the messages
+However wouldn't you want to minimize the number of messages
 if you are replicating only the accounting `dept`?
-Wouldn't you want to prevent sending events to the client
+Would you want to not send events to the client
 for mutations involving records from other departments?
 
-The answer is yes, and no.
+**The answer is yes, and no.**
 
 ## State
 
 Filtering requires the server to maintain state,
 that is, to save in memory some information for each client.
-State is something we try to avoid when possible as it reduces the number of connections a server
+State is something we try to avoid whenever possible as it may reduce the number of connections a server
 can handle.
 
 This may not be that great a concern for us.
@@ -40,14 +41,15 @@ More importantly, filtering imposes a processing load on the server
 which may or may not be significant.
 
 Assume we are replicating only records for the accounting department,
-and consider these events:
+and consider this:
 - The remote service has a particular record belonging to the accounting department.
 - Our client's local service has replicated that record.
 - Someone (not us!) mutates that record, moving it to the receiving department.
 - The client has to be informed of this mutation so it can remove that record from the local service
 as it no longer belongs to accounting.
 - Feathers service event filters only provide the latest contents of a record,
-so we wouldn't have enough information to know the event has to be sent.
+so we would not have enough information to know the event has to be sent.
+We would not know the record used to be from accounting, and no longer is.
 
 That's why, in the general case, the server component of offline-first
 must read the before value of the record before mutating it.
@@ -60,3 +62,41 @@ Database `get` calls are usually fast.
 The before record contents may still be cached and quickly available.
 This extra `get` may not impose an excessive extra load on the server,
 but it has to be kept in mind.
+
+> **ProTip** The extra processing load may not be excessive
+unless the server handles a **lot** of clients.
+
+## Apps restricted to one user
+
+The core data for many mobile applications is unique to the user using the application.
+Each record indicates the user the contents are for and, **most importantly**,
+the record cannot be transferred to another user.
+
+So if we use a publication like `userData`
+```javascript
+publications = {
+  userData: username => (data, connection, hook) => data.username === username,
+};
+```
+the value of `data.username` will never change.
+
+This means the server component of the replicator does not need to `get` the before value
+of the record, as the only field the publication function is interested in, `data.username`,
+is always the same on the before and current records.
+
+That is why the replicator's `publication` option in this case
+ ```javascript
+ publication: { module: publications, name: 'userData', params: [username], checkBefore: false }
+ ```
+contains the `checkBefore: false` option.
+It indicates the before record need not be checked for this publication.
+
+
+## Browsers
+
+You may want to send all service events to browser clients
+unless they are on very slow connections.
+
+## Mobile devices
+
+Mobile devices

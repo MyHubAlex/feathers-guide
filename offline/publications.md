@@ -1,12 +1,12 @@
 # Publications
 
 The local service will replicate the entire remote service by default.
-You can replicate just a subset of the remote service records using **publications**.
+You may replicate only a subset of the remote service records using **publications**.
 
 ## Publication functions
 
 A `publication` is a function which, given a record, indicates if it belongs to its subset.
-It will always run on the client if a subset of the recorsd is being replicated.
+It will always run on the client if used.
 It optionally runs on the server to reduce the number of service events being sent the client.
 
 Here are two publication functions within a `publications` object.
@@ -37,7 +37,7 @@ Features:
 * dot notation searching
 
 Publications are passed only the `data` object when they are run on the client.
-They are passed the `data`, `connection`, and `hook` objects when they are run as
+They are additionally passed the `connection` and `hook` objects when they are run as
 [service event filters](https://docs.feathersjs.com/api/events.html#event-filtering)
 on the server.
 
@@ -57,7 +57,7 @@ This would call the publication function using
 `publications.userData(...params)(data, connection, hook)`.
 
 Assuming the record layout had a `dept` field,
-we could replicate only the records for the accounting department.
+we could replicate only the records for the accounting department with:
 ```javascript
 const commonPublications = require('feathers-mobile/lib/common/commonPublications');
 ...

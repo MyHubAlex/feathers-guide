@@ -49,6 +49,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
+    <link rel="next" href="publications.html" />
+    
     
     <link rel="prev" href="syncdata-syncnet.html" />
     
@@ -680,6 +682,32 @@
             
         </li>
     
+        <li class="chapter " data-level="1.5.7" data-path="publications.html">
+            
+                <a href="publications.html">
+            
+                    
+                    Publications
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="filtering.html">
+            
+                <a href="filtering.html">
+            
+                    
+                    Filtering service events
+            
+                </a>
+            
+
+            
+        </li>
+    
 
             </ul>
             
@@ -770,7 +798,7 @@ There is no avoiding this when you are capable of creating new records.</p>
 <p>The remote and local services may have these record layouts.</p>
 <p><img src="assets/layout-own-data-a.jpg" alt="layout-own-data-a"></p>
 <p>You may have to add the <code>uuid</code> field to your present layouts.
-You can generate the values with:</p>
+You can generate them with:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { getUuid } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/utils/hash&apos;</span>);
 ...
 data.uuid = getUuid();
@@ -780,8 +808,9 @@ which are based on <code>__id</code> and <code>___id</code> fields.
 However you are advised to use the <code>uuid</code> field in new databases.</p>
 <h2 id="dont-change-the-configuration-id-property">Don&apos;t change the configuration <code>id</code> property</h2>
 <p>Feathers supports a database configuration property <code>id</code> to specify which field
-is used as the index for the <code>get</code>, <code>update</code>, <code>patch</code> and <code>remove</code> methods.</p>
-<p><strong>You cannot use this feature with offline-first.</strong></p>
+is used as the index for the <code>get</code>, <code>update</code>, <code>patch</code> and <code>remove</code> methods.
+<strong>You cannot use this feature with offline-first</strong>
+as it depends on referencing the record key. </p>
 
                                 
                                 </section>
@@ -809,10 +838,14 @@ is used as the index for the <code>get</code>, <code>update</code>, <code>patch<
 
             
                 
-                <a href="syncdata-syncnet.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: sync-data & sync-net">
+                <a href="syncdata-syncnet.html" class="navigation navigation-prev " aria-label="Previous page: sync-data & sync-net">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
+                
+                <a href="publications.html" class="navigation navigation-next " aria-label="Next page: Publications">
+                    <i class="fa fa-angle-right"></i>
+                </a>
                 
             
         
@@ -821,7 +854,7 @@ is used as the index for the <code>get</code>, <code>update</code>, <code>patch<
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Database records","level":"1.5.6","depth":2,"previous":{"title":"sync-data & sync-net","level":"1.5.5","depth":2,"path":"offline/syncdata-syncnet.md","ref":"offline/syncdata-syncnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/database-records.md","mtime":"2017-05-14T13:55:01.279Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T14:04:21.507Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Database records","level":"1.5.6","depth":2,"next":{"title":"Publications","level":"1.5.7","depth":2,"path":"offline/publications.md","ref":"offline/publications.md","articles":[]},"previous":{"title":"sync-data & sync-net","level":"1.5.5","depth":2,"path":"offline/syncdata-syncnet.md","ref":"offline/syncdata-syncnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/database-records.md","mtime":"2017-05-14T14:10:56.520Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T17:41:47.343Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
