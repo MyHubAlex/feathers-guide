@@ -11,7 +11,7 @@ It optionally runs on the server to reduce the number of service events being se
 
 Here are two publication functions within a `publications` object.
 ```javascript
-const { query } = require('feathers-mobile/lib/common/commonPublicationa');
+const { query } = require('feathers-mobile/lib/common/commonPublications');
 
 publications = {
   userData: username => (data, connection, hook) => data.username === username,
@@ -41,3 +41,27 @@ They are passed the `data`, `connection`, and `hook` objects when they are run a
 [service event filters](https://docs.feathersjs.com/api/events.html#event-filtering)
 on the server.
 
+## Publications on the client
+
+We will later discuss how to start a replication on the client.
+However let's round out our current discussion by briefly looking
+at the replicator's `publication` option.
+
+We could replicate only records belonging to one user using the publications object
+we wrote above.
+```javascript
+publication: { module: publications, name: 'userData', params: [username], checkBefore: false }
+```
+
+This would call the publication function using
+`publications.userData(...params)(data, connection, hook)`.
+
+Assuming the record layout had a `dept` field,
+we could replicate only the records for the accounting department.
+```javascript
+const commonPublications = require('feathers-mobile/lib/common/commonPublications');
+...
+publication: { module: commonPublications, name: 'query', params: { dept: 'acct' } }
+```
+
+## Publications
