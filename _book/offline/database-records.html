@@ -743,15 +743,45 @@ Some databases use <code>_id</code> as their record id, while others use <code>i
 Some have string ids, while others use numbers.
 Some allow you to set the id when the record is bring created,
 others set the id themselves.</p>
-<p>Therefore the layout of the local database differs slightly from the remote&apos;s.</p>
+<p>Therefore the layout of the local database differs slightly from the remote&apos;s.
+However these will have a minimal impact on your existing database design,
+as that was one of our goals.</p>
 <p>Its non uncommon for records to contain the keys of other records.
 These references are retained in the local copies,
 you just have to understand how.</p>
-<h2 id="snapshot-and-realtime-record-layouts">Snapshot and Realtime record layouts</h2>
+<h2 id="record-layouts-for-snapshot-and-realtime">Record layouts for snapshot and realtime</h2>
 <p>Assume the remote service has this layout.</p>
 <p><img src="assets/layout-snapshot-a-remote.jpg" alt="layout-snapshot-a-remote"></p>
 <p>The local service will have this layout using the snapshot or realtime strategies.</p>
 <p><img src="assets/layout-snapshot-a-local.jpg" alt="layout-snapshot-a-local"></p>
+<p>Any remote service&apos;s <code>id</code> field is renamed <code>__id</code> on the local service.
+Any <code>_id</code> to <code>___id</code>.</p>
+<p>If you would search the remote service for records having a specific <code>id</code> value,
+you can search the local service for that <code>__id</code> value.</p>
+<blockquote>
+<p><strong>ProTip</strong> IMPORTANT: Do not depend on the local service&apos;s <code>id</code> and <code>_id</code> values.
+They are likely to change when the client service recovers from a disconnection.</p>
+</blockquote>
+<h2 id="record-layouts-for-other-strategies">Record layouts for other strategies</h2>
+<p>The remaining strategies require you have a
+<a href="https://en.wikipedia.org/wiki/Universally_unique_identifier" target="_blank"><code>uuid</code></a>
+field in the record layout.
+There is no avoiding this when you are capable of creating new records.</p>
+<p>The remote and local services may have these record layouts.</p>
+<p><img src="assets/layout-own-data-a.jpg" alt="layout-own-data-a"></p>
+<p>You may have to add the <code>uuid</code> field to your present layouts.
+You can generate the values with:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { getUuid } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/utils/hash&apos;</span>);
+...
+data.uuid = getUuid();
+</code></pre>
+<p>In existing databases, you will probably continue to use references to other records
+which are based on <code>__id</code> and <code>___id</code> fields.
+However you are advised to use the <code>uuid</code> field in new databases.</p>
+<h2 id="dont-change-the-configuration-id-property">Don&apos;t change the configuration <code>id</code> property</h2>
+<p>Feathers supports a database configuration property <code>id</code> to specify which field
+is used as the index for the <code>get</code>, <code>update</code>, <code>patch</code> and <code>remove</code> methods.</p>
+<p><strong>You cannot use this feature with offline-first.</strong></p>
 
                                 
                                 </section>
@@ -791,7 +821,7 @@ you just have to understand how.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Database records","level":"1.5.6","depth":2,"previous":{"title":"sync-data & sync-net","level":"1.5.5","depth":2,"path":"offline/syncdata-syncnet.md","ref":"offline/syncdata-syncnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/database-records.md","mtime":"2017-05-14T01:45:37.246Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T01:49:45.130Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Database records","level":"1.5.6","depth":2,"previous":{"title":"sync-data & sync-net","level":"1.5.5","depth":2,"path":"offline/syncdata-syncnet.md","ref":"offline/syncdata-syncnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/database-records.md","mtime":"2017-05-14T13:55:01.279Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T14:04:21.507Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

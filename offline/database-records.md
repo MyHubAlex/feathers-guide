@@ -34,8 +34,8 @@ The local service will have this layout using the snapshot or realtime strategie
 
 ![layout-snapshot-a-local](./assets/layout-snapshot-a-local.jpg)
 
-The remote service's `id` is renamed `__id` on the local service.
-The remote's `_id` as `___id`.
+Any remote service's `id` field is renamed `__id` on the local service.
+Any `_id` to `___id`.
 
 If you would search the remote service for records having a specific `id` value,
 you can search the local service for that `__id` value.
@@ -55,7 +55,7 @@ The remote and local services may have these record layouts.
 ![layout-own-data-a](./assets/layout-own-data-a.jpg)
 
 You may have to add the `uuid` field to your present layouts.
-You can generate the values with:
+You can generate them with:
 
 ```javascript
 const { getUuid } = require('feathers-mobile/lib/utils/hash');
@@ -71,5 +71,5 @@ However you are advised to use the `uuid` field in new databases.
 
 Feathers supports a database configuration property `id` to specify which field
 is used as the index for the `get`, `update`, `patch` and `remove` methods.
-
-**You cannot use this feature with offline-first.**
+**You cannot use this feature with offline-first**
+as it depends on referencing the record key. 
