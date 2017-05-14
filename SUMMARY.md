@@ -44,5 +44,6 @@
     * [sync-data & sync-net](offline/syncdata-syncnet.md)
     * [Database records](offline/database-records.md)
     * [Publications](offline/publications.md)
+    * [Filtering service events](offline/filtering.md)
     
     
