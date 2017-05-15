@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Publications · GitBook</title>
+        <title>Browsers & mobile devices · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -49,10 +49,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="filtering.html" />
     
-    
-    <link rel="prev" href="database-records.html" />
+    <link rel="prev" href="filtering.html" />
     
 
     </head>
@@ -682,7 +680,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.5.7" data-path="publications.html">
+        <li class="chapter " data-level="1.5.7" data-path="publications.html">
             
                 <a href="publications.html">
             
@@ -708,7 +706,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.9" data-path="browsers-mobile-devices.html">
+        <li class="chapter active" data-level="1.5.9" data-path="browsers-mobile-devices.html">
             
                 <a href="browsers-mobile-devices.html">
             
@@ -756,7 +754,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Publications</a>
+        <a href=".." >Browsers & mobile devices</a>
     </h1>
 </div>
 
@@ -771,65 +769,13 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="publications">Publications</h1>
-<p>The local service will replicate the entire remote service by default.
-You may replicate only a subset of the remote service records using <strong>publications</strong>.</p>
-<h2 id="publication-functions">Publication functions</h2>
-<p>A <code>publication</code> is a function which, given a record, indicates if it belongs to its subset.
-It will always run on the client if used.
-It optionally runs on the server to reduce the number of service events being sent the client.</p>
-<p>Here are two publication functions within a <code>publications</code> object.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { query } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-
-publications = {
-  userData: username =&gt; (data, connection, hook) =&gt; data.username === username,
-
-  query
-};
-</code></pre>
-<p>The <code>userData</code> publication restricts the records to those belonging to the provided <code>username</code>.
-You might use a publication like this in an app where each user has their own compartmentalized data
-which other users cannot see.
-This allows the records for all users to be kept in one table
-rather than having a separate table for each user.</p>
-<p>The <code>query</code> publication is provided with offline-first,
-and you are likely to use it often.
-It tests records with <a href="http://docs.mongodb.org/manual/reference/operator/query/" target="_blank">MongoDB queries</a>.</p>
-<p>Features:</p>
-<ul>
-<li>Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and, $or, $nor, $not, $size, $type, $regex, $where, $elemMatch</li>
-<li>Regexp searches</li>
-<li>sub object searching</li>
-<li>dot notation searching</li>
-</ul>
-<p>Publications are passed only the <code>data</code> object when they are run on the client.
-They are additionally passed the <code>connection</code> and <code>hook</code> objects when they are run as
-<a href="https://docs.feathersjs.com/api/events.html#event-filtering" target="_blank">service event filters</a>
-on the server.</p>
-<h2 id="publications-on-the-client">Publications on the client</h2>
-<p>We will later discuss how to start a replication on the client.
-However let&apos;s round out our current discussion by briefly looking
-at the replicator&apos;s <code>publication</code> option.</p>
-<p>We could replicate only records belonging to one user using the publications object
-we wrote above.</p>
-<pre><code class="lang-javascript">publication: { <span class="hljs-built_in">module</span>: publications, name: <span class="hljs-string">&apos;userData&apos;</span>, params: [username], checkBefore: <span class="hljs-literal">false</span> }
-</code></pre>
-<p>This would call the publication function using
-<code>publications.userData(...params)(data, connection, hook)</code>.</p>
-<p>Assuming the record layout had a <code>dept</code> field,
-we could replicate only the records for the accounting department with:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-...
-publication: { <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;acct&apos;</span> } }
-</code></pre>
-<h2 id="publications-on-the-server">Publications on the server</h2>
-<p>The server is automatically aware of which publication each client is using for each remote service.
-Furthermore the server components of offline-first can configure
-<a href="https://docs.feathersjs.com/api/events.html#event-filtering" target="_blank">service event filters</a>
-to control the events sent to each client.</p>
-<p>We can see that both the client and the server may <code>require</code> the same <code>publications</code> object.
-So its best to keep these in a directory that can be shared between the client and server code.
-That&apos;s why the <code>feathers-mobile/lib/common/commonPublications</code> path contains a <code>common</code> directory.</p>
+                                <h1 id="browsers-and-mobile-devices">Browsers and Mobile Devices</h1>
+<h2 id="browsers">Browsers</h2>
+<p>You may want to send all service events to browser clients
+unless they are on very slow connections.</p>
+<h2 id="mobile-devices">Mobile devices</h2>
+<p>Mobile devices tend to have slow connections.
+You may want to minimize the number of service events sent them.</p>
 
                                 
                                 </section>
@@ -857,14 +803,10 @@ That&apos;s why the <code>feathers-mobile/lib/common/commonPublications</code> p
 
             
                 
-                <a href="database-records.html" class="navigation navigation-prev " aria-label="Previous page: Database records">
+                <a href="filtering.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Filtering service events">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
-                
-                <a href="filtering.html" class="navigation navigation-next " aria-label="Next page: Filtering service events">
-                    <i class="fa fa-angle-right"></i>
-                </a>
                 
             
         
@@ -873,7 +815,7 @@ That&apos;s why the <code>feathers-mobile/lib/common/commonPublications</code> p
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Publications","level":"1.5.7","depth":2,"next":{"title":"Filtering service events","level":"1.5.8","depth":2,"path":"offline/filtering.md","ref":"offline/filtering.md","articles":[]},"previous":{"title":"Database records","level":"1.5.6","depth":2,"path":"offline/database-records.md","ref":"offline/database-records.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/publications.md","mtime":"2017-05-14T19:19:30.725Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T19:53:08.905Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"previous":{"title":"Filtering service events","level":"1.5.8","depth":2,"path":"offline/filtering.md","ref":"offline/filtering.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/browsers-mobile-devices.md","mtime":"2017-05-14T19:50:24.252Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T19:53:08.905Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
