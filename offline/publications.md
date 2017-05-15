@@ -5,11 +5,18 @@ You may replicate only a subset of the remote service records using **publicatio
 
 ## Publication functions
 
-A `publication` is a function which, given a record, indicates if it belongs to its subset.
-It will always run on the client if used.
-It optionally runs on the server to reduce the number of service events being sent the client.
+A `publication` is a function which, given a record,
+indicates if it belongs to the subset of records the publication identifies.
+For example a publication could select all the records belonging to a specific user.
 
-Here are two publication functions within a `publications` object.
+The publication function, if one is provided, will always run on the client.
+It will identify service events which are relevant to the publication.
+
+The publication function optionally runs on the server
+to reduce the number of service events sent the client.
+This may potentially result in better throughput.
+
+Here is a `publications` object containing two publication functions:
 ```javascript
 const { query } = require('feathers-mobile/lib/common/commonPublications');
 
