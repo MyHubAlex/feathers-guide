@@ -83,3 +83,8 @@ to control the events sent to each client.
 We can see that both the client and the server are likely `require` the same `publications` object.
 So its best to keep these in a directory that can be shared between the client and server code.
 That's why the `feathers-mobile/lib/common/commonPublications` path contains a `common` directory.
+
+## Publications with server hooks
+
+Information about the current client's publication for a remote service is available
+to the hooks that run for that service.
