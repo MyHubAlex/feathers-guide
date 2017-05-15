@@ -40,21 +40,21 @@ offline-first does so as well.
 More importantly, filtering imposes a processing load on the server
 which may or may not be significant.
 
-Assume we are replicating only records for the accounting department,
+Assume we are replicating just the records for the accounting department,
 and consider this:
 - The remote service has a particular record belonging to the accounting department.
 - Our client's local service has replicated that record.
 - Someone (not us!) mutates that record, moving it to the receiving department.
-- The client has to be informed of this mutation so it can remove that record from the local service
+- The client has to be informed of this mutation so it can remove that record from its local service
 as it no longer belongs to accounting.
 - Feathers service event filters only provide the latest contents of a record,
-so we would not have enough information to know the event has to be sent.
+so we would not have enough information to know the event needs to be sent.
 We would not know the record used to be from accounting, and no longer is.
 
 That's why, in the general case, the server component of offline-first
 must read the before value of the record before mutating it.
-The publication function can be used on both the before and current record contents
-to properly determine if the mutation needs to be sent to a client.
+The publication function has to be used on both the before and current record contents
+to properly determine if the mutation needs to be emitted to a client.
 
 > **ProTip** The before record is read just one per mutation, not once per client.
 
