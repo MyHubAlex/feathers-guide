@@ -58,6 +58,9 @@ to properly determine if the mutation needs to be emitted to a client.
 
 > **ProTip** The before record is read just one per mutation, not once per client.
 
+> **ProTip** The before and current record contents are always checked on the client
+as there is negligible performance impact.
+
 Database `get` calls are usually fast.
 The before record contents may still be cached and quickly available.
 This extra `get` may not impose an excessive extra load on the server,
@@ -66,7 +69,7 @@ but it has to be kept in mind.
 > **ProTip** The extra processing load may not be excessive
 unless the server handles a **lot** of clients.
 
-## Apps restricted to one user
+## Apps having just one user
 
 The core data for many mobile applications is unique to the user using the application.
 Each record indicates the user the contents are for and, **most importantly**,
@@ -86,7 +89,15 @@ is always the same on the before and current records.
 
 That is why the replicator's `publication` option in this case
  ```javascript
- publication: { module: publications, name: 'userData', params: [username], checkBefore: false }
+ publication: {
+   module: publications, name: 'userData', params: [username],
+   ifServer: true, checkBefore: false
+ }
  ```
 contains the `checkBefore: false` option.
 It indicates the before record need not be checked for this publication.
+
+> **ProTip** The `ifServer` option determines if the publication also runs on the server.
+
+> **ProTip** The defaults are `ifServer: false` and `ifBefore: true` because this combination
+will always produce correct results and is often the most efficient.
