@@ -1,24 +1,24 @@
 # Filtering service events
 
-A service event is sent to each client every time the remote service is mutated,
+Feathers, by default, emits a service event to each client every time a service is mutated,
 regardless of who mutated it, or how it was mutated.
 
-Consider this sequence of events:
+Offline-first uses these events to synchronize services while the client is connected to the server.
 - The client mutates a record in the local service.
 - The replicator automatically mutates that record on the remote service.
 - That remote mutation may run hooks which further mutate the remote record,
 e.g. the [`setNow`](https://docs.feathersjs.com/api/hooks-common.html#setnow)
 hook is used on the remote service.
-- The service event sends the new version of the remote service to the client.
+- The service event emits the new version of the remote service to the client.
 - The replicator automatically mutates the record on the local service to match the remote's.
 
-You need all these messages if you are replicating the whole database.
-However wouldn't you want to minimize the number of messages
-if you are replicating only the accounting `dept`?
-Would you want to not send events to the client
-for mutations involving records from other departments?
+You need to act on all events if you are replicating the entire database.
+However wouldn't you want to minimize the number of events sent
+if you are replicating only a subset of the database?
+Would you want to stop the emitting of events for mutations involving records
+from other departments if you are only interested in records from accounting?
 
-**The answer is yes, and no.**
+**The answer is yes ... and no.**
 
 ## State
 
