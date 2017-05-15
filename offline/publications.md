@@ -16,7 +16,7 @@ The publication function optionally runs on the server
 to reduce the number of service events sent the client.
 This may potentially result in better throughput.
 
-Here is a `publications` object containing two publication functions:
+Here is a `publications` object containing two `publication` functions:
 ```javascript
 const { query } = require('feathers-mobile/lib/common/commonPublications');
 
@@ -27,18 +27,19 @@ publications = {
 };
 ```
 
-The `userData` publication restricts the records to those belonging to the provided `username`.
+The `userData` publication identifies the subset of records belonging to the provided `username`.
 You might use a publication like this in an app where each user has their own compartmentalized data
 which other users cannot see.
-This allows the records for all users to be kept in one table
-rather than having a separate table for each user.
+This would allow the records for all users to be kept in one table
+rather than using a separate table for each user.
 
-The `query` publication is provided with offline-first,
+The `query` publication is one provided with offline-first,
 and you are likely to use it often.
 It tests records with [MongoDB queries](http://docs.mongodb.org/manual/reference/operator/query/).
 
 Features:
-* Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and, $or, $nor, $not, $size, $type, $regex, $where, $elemMatch
+* Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and, $or,
+$nor, $not, $size, $type, $regex, $where, $elemMatch
 * Regexp searches
 * sub object searching
 * dot notation searching
