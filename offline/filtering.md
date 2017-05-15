@@ -24,14 +24,14 @@ from other departments if you are only interested in records from accounting?
 
 Filtering requires the server to maintain state,
 that is, to save in memory some information for each client.
-State is something we try to avoid whenever possible as it may reduce the number of connections a server
-can handle.
+State is something we try to avoid whenever possible
+as it may reduce the number of connections a server can handle.
 
-This may not be that great a concern for us.
-Offline-first is available with WebSocket clients only,
-and both socket.io and Primus retain state.
-Furthermore Feathers uses their state storage for its own needs,
-as does offline-first.
+This may not be of critical a concern for us.
+Offline-first is available only for WebSocket clients,
+and both socket.io and Primus both retain state.
+Feathers uses their state storage mechanisms for its own needs,
+offline-first does so as well.
 
 > **ProTip** State will likely not be a concern unless you use a **lot** of publications.
 
