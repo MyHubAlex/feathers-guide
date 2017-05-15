@@ -51,14 +51,14 @@ on the server.
 
 ## Publications on the client
 
-We will later discuss how to start a replication on the client.
-However let's round out our current discussion by briefly looking
+We will discuss later how to start a replication on the client.
+However let's continue out our discussion by briefly looking
 at the replicator's `publication` option.
 
 We could replicate only records belonging to one user using the publications object
 we wrote above.
 ```javascript
-publication: { module: publications, name: 'userData', params: [username], checkBefore: false }
+publication: { module: publications, name: 'userData', params: [username], ifServer: true, checkBefore: false }
 ```
 
 This would call the publication function using
@@ -74,11 +74,12 @@ publication: { module: commonPublications, name: 'query', params: { dept: 'acct'
 
 ## Publications on the server
 
-The server is automatically aware of which publication each client is using for each remote service.
+The server is automatically informed of
+which publication each client is using for each remote service.
 Furthermore the server components of offline-first can configure
 [service event filters](https://docs.feathersjs.com/api/events.html#event-filtering)
 to control the events sent to each client.
 
-We can see that both the client and the server may `require` the same `publications` object.
+We can see that both the client and the server are likely `require` the same `publications` object.
 So its best to keep these in a directory that can be shared between the client and server code.
 That's why the `feathers-mobile/lib/common/commonPublications` path contains a `common` directory.
