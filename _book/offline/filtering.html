@@ -772,58 +772,60 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="filtering-service-events">Filtering service events</h1>
-<p>A service event is sent to each client every time the remote service is mutated,
+<p>Feathers, by default, emits a service event to each client every time a service is mutated,
 regardless of who mutated it, or how it was mutated.</p>
-<p>Consider this sequence of events:</p>
+<p>Offline-first uses these events to synchronize services while the client is connected to the server.</p>
 <ul>
 <li>The client mutates a record in the local service.</li>
 <li>The replicator automatically mutates that record on the remote service.</li>
 <li>That remote mutation may run hooks which further mutate the remote record,
 e.g. the <a href="https://docs.feathersjs.com/api/hooks-common.html#setnow" target="_blank"><code>setNow</code></a>
 hook is used on the remote service.</li>
-<li>The service event sends the new version of the remote service to the client.</li>
+<li>The service event emits the new version of the remote service to the client.</li>
 <li>The replicator automatically mutates the record on the local service to match the remote&apos;s.</li>
 </ul>
-<p>You need all these messages if you are replicating the whole database.
-However wouldn&apos;t you want to minimize the number of messages
-if you are replicating only the accounting <code>dept</code>?
-Would you want to not send events to the client
-for mutations involving records from other departments?</p>
-<p><strong>The answer is yes, and no.</strong></p>
+<p>You need to act on all events if you are replicating the entire database.
+However wouldn&apos;t you want to minimize the number of events sent
+if you are replicating only a subset of the database?
+Would you want to stop the emitting of events for mutations involving records
+from other departments if you are only interested in records from accounting?</p>
+<p><strong>The answer is yes ... and no.</strong></p>
 <h2 id="state">State</h2>
 <p>Filtering requires the server to maintain state,
 that is, to save in memory some information for each client.
-State is something we try to avoid whenever possible as it may reduce the number of connections a server
-can handle.</p>
-<p>This may not be that great a concern for us.
-Offline-first is available with WebSocket clients only,
-and both socket.io and Primus retain state.
-Furthermore Feathers uses their state storage for its own needs,
-as does offline-first.</p>
+State is something we try to avoid whenever possible
+as it may reduce the number of connections a server can handle.</p>
+<p>This may not be of critical a concern for us.
+Offline-first is available only for WebSocket clients,
+and both socket.io and Primus both retain state.
+Feathers uses their state storage mechanisms for its own needs,
+offline-first does so as well.</p>
 <blockquote>
 <p><strong>ProTip</strong> State will likely not be a concern unless you use a <strong>lot</strong> of publications.</p>
 </blockquote>
 <h2 id="processing-load">Processing load</h2>
 <p>More importantly, filtering imposes a processing load on the server
 which may or may not be significant.</p>
-<p>Assume we are replicating only records for the accounting department,
+<p>Assume we are replicating just the records for the accounting department,
 and consider this:</p>
 <ul>
 <li>The remote service has a particular record belonging to the accounting department.</li>
 <li>Our client&apos;s local service has replicated that record.</li>
 <li>Someone (not us!) mutates that record, moving it to the receiving department.</li>
-<li>The client has to be informed of this mutation so it can remove that record from the local service
+<li>The client has to be informed of this mutation so it can remove that record from its local service
 as it no longer belongs to accounting.</li>
 <li>Feathers service event filters only provide the latest contents of a record,
-so we would not have enough information to know the event has to be sent.
+so we would not have enough information to know the event needs to be sent.
 We would not know the record used to be from accounting, and no longer is.</li>
 </ul>
 <p>That&apos;s why, in the general case, the server component of offline-first
 must read the before value of the record before mutating it.
-The publication function can be used on both the before and current record contents
-to properly determine if the mutation needs to be sent to a client.</p>
+The publication function has to be used on both the before and current record contents
+to properly determine if the mutation needs to be emitted to a client.</p>
 <blockquote>
 <p><strong>ProTip</strong> The before record is read just one per mutation, not once per client.</p>
+<p><strong>ProTip</strong> The before and current record contents are always checked on the client
+as there is negligible performance impact.</p>
 </blockquote>
 <p>Database <code>get</code> calls are usually fast.
 The before record contents may still be cached and quickly available.
@@ -833,7 +835,7 @@ but it has to be kept in mind.</p>
 <p><strong>ProTip</strong> The extra processing load may not be excessive
 unless the server handles a <strong>lot</strong> of clients.</p>
 </blockquote>
-<h2 id="apps-restricted-to-one-user">Apps restricted to one user</h2>
+<h2 id="apps-having-just-one-user">Apps having just one user</h2>
 <p>The core data for many mobile applications is unique to the user using the application.
 Each record indicates the user the contents are for and, <strong>most importantly</strong>,
 the record cannot be transferred to another user.</p>
@@ -847,10 +849,18 @@ the record cannot be transferred to another user.</p>
 of the record, as the only field the publication function is interested in, <code>data.username</code>,
 is always the same on the before and current records.</p>
 <p>That is why the replicator&apos;s <code>publication</code> option in this case</p>
-<pre><code class="lang-javascript"> publication: { <span class="hljs-built_in">module</span>: publications, name: <span class="hljs-string">&apos;userData&apos;</span>, params: [username], checkBefore: <span class="hljs-literal">false</span> }
+<pre><code class="lang-javascript"> publication: {
+   <span class="hljs-built_in">module</span>: publications, name: <span class="hljs-string">&apos;userData&apos;</span>, params: [username],
+   ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">false</span>
+ }
 </code></pre>
 <p>contains the <code>checkBefore: false</code> option.
 It indicates the before record need not be checked for this publication.</p>
+<blockquote>
+<p><strong>ProTip</strong> The <code>ifServer</code> option determines if the publication also runs on the server.</p>
+<p><strong>ProTip</strong> The defaults are <code>ifServer: false</code> and <code>ifBefore: true</code> because this combination
+will always produce correct results and is often the most efficient.</p>
+</blockquote>
 
                                 
                                 </section>
@@ -894,7 +904,7 @@ It indicates the before record need not be checked for this publication.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Filtering service events","level":"1.5.8","depth":2,"next":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"previous":{"title":"Publications","level":"1.5.7","depth":2,"path":"offline/publications.md","ref":"offline/publications.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/filtering.md","mtime":"2017-05-14T19:47:53.049Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T19:53:08.905Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Filtering service events","level":"1.5.8","depth":2,"next":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"previous":{"title":"Publications","level":"1.5.7","depth":2,"path":"offline/publications.md","ref":"offline/publications.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/filtering.md","mtime":"2017-05-15T19:21:50.682Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-16T14:00:51.099Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

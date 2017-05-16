@@ -22,7 +22,6 @@ const { query } = require('feathers-mobile/lib/common/commonPublications');
 
 publications = {
   userData: username => (data, connection, hook) => data.username === username,
-  
   query
 };
 ```
@@ -58,7 +57,10 @@ at the replicator's `publication` option.
 We could replicate only records belonging to one user using the publications object
 we wrote above.
 ```javascript
-publication: { module: publications, name: 'userData', params: [username], ifServer: true, checkBefore: false }
+publication: {
+  module: publications, name: 'userData', params: [username],
+  ifServer: true, checkBefore: false
+}
 ```
 
 This would call the publication function using

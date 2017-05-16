@@ -775,10 +775,15 @@
 <p>The local service will replicate the entire remote service by default.
 You may replicate only a subset of the remote service records using <strong>publications</strong>.</p>
 <h2 id="publication-functions">Publication functions</h2>
-<p>A <code>publication</code> is a function which, given a record, indicates if it belongs to its subset.
-It will always run on the client if used.
-It optionally runs on the server to reduce the number of service events being sent the client.</p>
-<p>Here are two publication functions within a <code>publications</code> object.</p>
+<p>A <code>publication</code> is a function which, given a record,
+indicates if it belongs to the subset of records the publication identifies.
+For example a publication could select all the records belonging to a specific user.</p>
+<p>The publication function, if one is provided, will always run on the client.
+It will identify service events which are relevant to the publication.</p>
+<p>The publication function optionally runs on the server
+to reduce the number of service events sent the client.
+This may potentially result in better throughput.</p>
+<p>Here is a <code>publications</code> object containing two <code>publication</code> functions:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { query } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
 
 publications = {
@@ -787,17 +792,18 @@ publications = {
   query
 };
 </code></pre>
-<p>The <code>userData</code> publication restricts the records to those belonging to the provided <code>username</code>.
+<p>The <code>userData</code> publication identifies the subset of records belonging to the provided <code>username</code>.
 You might use a publication like this in an app where each user has their own compartmentalized data
 which other users cannot see.
-This allows the records for all users to be kept in one table
-rather than having a separate table for each user.</p>
-<p>The <code>query</code> publication is provided with offline-first,
+This would allow the records for all users to be kept in one table
+rather than using a separate table for each user.</p>
+<p>The <code>query</code> publication is one provided with offline-first,
 and you are likely to use it often.
 It tests records with <a href="http://docs.mongodb.org/manual/reference/operator/query/" target="_blank">MongoDB queries</a>.</p>
 <p>Features:</p>
 <ul>
-<li>Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and, $or, $nor, $not, $size, $type, $regex, $where, $elemMatch</li>
+<li>Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and, $or,
+$nor, $not, $size, $type, $regex, $where, $elemMatch</li>
 <li>Regexp searches</li>
 <li>sub object searching</li>
 <li>dot notation searching</li>
@@ -807,12 +813,12 @@ They are additionally passed the <code>connection</code> and <code>hook</code> o
 <a href="https://docs.feathersjs.com/api/events.html#event-filtering" target="_blank">service event filters</a>
 on the server.</p>
 <h2 id="publications-on-the-client">Publications on the client</h2>
-<p>We will later discuss how to start a replication on the client.
-However let&apos;s round out our current discussion by briefly looking
+<p>We will discuss later how to start a replication on the client.
+However let&apos;s continue out our discussion by briefly looking
 at the replicator&apos;s <code>publication</code> option.</p>
 <p>We could replicate only records belonging to one user using the publications object
 we wrote above.</p>
-<pre><code class="lang-javascript">publication: { <span class="hljs-built_in">module</span>: publications, name: <span class="hljs-string">&apos;userData&apos;</span>, params: [username], checkBefore: <span class="hljs-literal">false</span> }
+<pre><code class="lang-javascript">publication: { <span class="hljs-built_in">module</span>: publications, name: <span class="hljs-string">&apos;userData&apos;</span>, params: [username], ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">false</span> }
 </code></pre>
 <p>This would call the publication function using
 <code>publications.userData(...params)(data, connection, hook)</code>.</p>
@@ -823,13 +829,17 @@ we could replicate only the records for the accounting department with:</p>
 publication: { <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;acct&apos;</span> } }
 </code></pre>
 <h2 id="publications-on-the-server">Publications on the server</h2>
-<p>The server is automatically aware of which publication each client is using for each remote service.
+<p>The server is automatically informed of
+which publication each client is using for each remote service.
 Furthermore the server components of offline-first can configure
 <a href="https://docs.feathersjs.com/api/events.html#event-filtering" target="_blank">service event filters</a>
 to control the events sent to each client.</p>
-<p>We can see that both the client and the server may <code>require</code> the same <code>publications</code> object.
+<p>We can see that both the client and the server are likely <code>require</code> the same <code>publications</code> object.
 So its best to keep these in a directory that can be shared between the client and server code.
 That&apos;s why the <code>feathers-mobile/lib/common/commonPublications</code> path contains a <code>common</code> directory.</p>
+<h2 id="publications-with-server-hooks">Publications with server hooks</h2>
+<p>Information about the current client&apos;s publication for a remote service is available
+to the hooks that run for that service.</p>
 
                                 
                                 </section>
@@ -873,7 +883,7 @@ That&apos;s why the <code>feathers-mobile/lib/common/commonPublications</code> p
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Publications","level":"1.5.7","depth":2,"next":{"title":"Filtering service events","level":"1.5.8","depth":2,"path":"offline/filtering.md","ref":"offline/filtering.md","articles":[]},"previous":{"title":"Database records","level":"1.5.6","depth":2,"path":"offline/database-records.md","ref":"offline/database-records.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/publications.md","mtime":"2017-05-14T19:19:30.725Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-14T19:53:08.905Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Publications","level":"1.5.7","depth":2,"next":{"title":"Filtering service events","level":"1.5.8","depth":2,"path":"offline/filtering.md","ref":"offline/filtering.md","articles":[]},"previous":{"title":"Database records","level":"1.5.6","depth":2,"path":"offline/database-records.md","ref":"offline/database-records.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/publications.md","mtime":"2017-05-15T18:56:19.121Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-16T14:00:51.099Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

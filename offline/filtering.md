@@ -78,7 +78,7 @@ the record cannot be transferred to another user.
 So if we use a publication like `userData`
 ```javascript
 publications = {
-  userData: username => (data, connection, hook) => data.username === username,
+  userData: username => (data, connection, hook) => data.username === username
 };
 ```
 the value of `data.username` will never change.
@@ -88,12 +88,12 @@ of the record, as the only field the publication function is interested in, `dat
 is always the same on the before and current records.
 
 That is why the replicator's `publication` option in this case
- ```javascript
- publication: {
-   module: publications, name: 'userData', params: [username],
-   ifServer: true, checkBefore: false
- }
- ```
+```javascript
+publication: {
+  module: publications, name: 'userData', params: [username],
+  ifServer: true, checkBefore: false
+}
+```
 contains the `checkBefore: false` option.
 It indicates the before record need not be checked for this publication.
 
