@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Publications · GitBook</title>
+        <title>Realtime setup · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -49,10 +49,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="filtering.html" />
     
-    
-    <link rel="prev" href="database-records.html" />
+    <link rel="prev" href="browsers-mobile-devices.html" />
     
 
     </head>
@@ -682,7 +680,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.5.7" data-path="publications.html">
+        <li class="chapter " data-level="1.5.7" data-path="publications.html">
             
                 <a href="publications.html">
             
@@ -721,7 +719,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.10" data-path="realtime-setup.html">
+        <li class="chapter active" data-level="1.5.10" data-path="realtime-setup.html">
             
                 <a href="realtime-setup.html">
             
@@ -769,7 +767,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Publications</a>
+        <a href=".." >Realtime setup</a>
     </h1>
 </div>
 
@@ -784,77 +782,66 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="publications">Publications</h1>
-<p>The local service will replicate the entire remote service by default.
-You may replicate only a subset of the remote service records using <strong>publications</strong>.</p>
-<h2 id="publication-functions">Publication functions</h2>
-<p>A <code>publication</code> is a function which, given a record,
-indicates if it belongs to the subset of records the publication identifies.
-For example a publication could select all the records belonging to a specific user.</p>
-<p>The publication function, if one is provided, will always run on the client.
-It will identify service events which are relevant to the publication.</p>
-<p>The publication function optionally runs on the server
-to reduce the number of service events sent the client.
-This may potentially result in better throughput.</p>
-<p>Here is a <code>publications</code> object containing two <code>publication</code> functions:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { query } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
+                                <h1 id="realtime-setup">Realtime setup</h1>
+<h2 id="with-server-publications">With server publications</h2>
+<h5 id="server-code">Server code</h5>
+<p>Attach hooks to each remote service:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstBeforeHookServer } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/server&apos;</span>);
+<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
-publications = {
-  userData: username =&gt; (data, connection, hook) =&gt; data.username === username,
-  query
+<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;remote-service&apos;</span>
+  before: {
+    all: [
+      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      offlineFirstBeforeHookServer() <span class="hljs-comment">// needed when replicate with checkBefore: true</span>
+    ]
+  }
 };
 </code></pre>
-<p>The <code>userData</code> publication identifies the subset of records belonging to the provided <code>username</code>.
-You might use a publication like this in an app where each user has their own compartmentalized data
-which other users cannot see.
-This would allow the records for all users to be kept in one table
-rather than using a separate table for each user.</p>
-<p>The <code>query</code> publication is one provided with offline-first,
-and you are likely to use it often.
-It tests records with <a href="http://docs.mongodb.org/manual/reference/operator/query/" target="_blank">MongoDB queries</a>.</p>
-<p>Features:</p>
-<ul>
-<li>Supported operators: $in, $nin, $exists, $gte, $gt, $lte, $lt, $eq, $ne, $mod, $all, $and, $or,
-$nor, $not, $size, $type, $regex, $where, $elemMatch</li>
-<li>Regexp searches</li>
-<li>sub object searching</li>
-<li>dot notation searching</li>
-</ul>
-<p>Publications are passed only the <code>data</code> object when they are run on the client.
-They are additionally passed the <code>connection</code> and <code>hook</code> objects when they are run as
-<a href="https://docs.feathersjs.com/api/events.html#event-filtering" target="_blank">service event filters</a>
-on the server.</p>
-<h2 id="publications-on-the-client">Publications on the client</h2>
-<p>We will discuss later how to start a replication on the client.
-However let&apos;s continue out our discussion by briefly looking
-at the replicator&apos;s <code>publication</code> option.</p>
-<p>We could replicate only records belonging to one user using the publications object
-we wrote above.</p>
-<pre><code class="lang-javascript">publication: {
-  <span class="hljs-built_in">module</span>: publications, name: <span class="hljs-string">&apos;userData&apos;</span>, params: [username],
-  ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">false</span>
-}
+<p>Startup server publication filters:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { serverOfflineFirst } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/server&apos;</span>);
+<span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/common/commonPublications&apos;</span>);
+
+serverOfflineFirst(app, [<span class="hljs-string">&apos;remote-service&apos;</span>], { publications: commonPublications });
 </code></pre>
-<p>This would call the publication function using
-<code>publications.userData(...params)(data, connection, hook)</code>.</p>
-<p>Assuming the record layout had a <code>dept</code> field,
-we could replicate only the records for the accounting department with:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-...
-publication: { <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;acct&apos;</span> } }
+<h5 id="client-code">Client code</h5>
+<p>Attach hooks to each local service:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise&apos;</span>);
+<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+
+<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
+  before: {
+    all: [
+      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  },
+
+  after: {
+    all: [
+      offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  }
+};
 </code></pre>
-<h2 id="publications-on-the-server">Publications on the server</h2>
-<p>The server is automatically informed of
-which publication each client is using for each remote service.
-Furthermore the server components of offline-first can configure
-<a href="https://docs.feathersjs.com/api/events.html#event-filtering" target="_blank">service event filters</a>
-to control the events sent to each client.</p>
-<p>We can see that both the client and the server are likely <code>require</code> the same <code>publications</code> object.
-So its best to keep these in a directory that can be shared between the client and server code.
-That&apos;s why the <code>feathers-mobile/lib/common/commonPublications</code> path contains a <code>common</code> directory.</p>
-<h2 id="publications-with-server-hooks">Publications with server hooks</h2>
-<p>Information about the current client&apos;s publication for a remote service is available
-to the hooks that run for that service.</p>
+<p>Configure the replication and start it:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/common/commonPublications&apos;</span>);
+<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/realtime&apos;</span>);
+
+<span class="hljs-keyword">const</span> replicator = realtime({
+  name: <span class="hljs-string">&apos;foo&apos;</span>,
+  app: clientApp,
+  remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
+  clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
+  publication: {
+    <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;a&apos;</span> },
+    ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">true</span>
+  },
+});
+
+replicator.subscribe()
+  .then(() =&gt; ...)
+</code></pre>
 
                                 
                                 </section>
@@ -882,14 +869,10 @@ to the hooks that run for that service.</p>
 
             
                 
-                <a href="database-records.html" class="navigation navigation-prev " aria-label="Previous page: Database records">
+                <a href="browsers-mobile-devices.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Browsers & mobile devices">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
-                
-                <a href="filtering.html" class="navigation navigation-next " aria-label="Next page: Filtering service events">
-                    <i class="fa fa-angle-right"></i>
-                </a>
                 
             
         
@@ -898,7 +881,7 @@ to the hooks that run for that service.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Publications","level":"1.5.7","depth":2,"next":{"title":"Filtering service events","level":"1.5.8","depth":2,"path":"offline/filtering.md","ref":"offline/filtering.md","articles":[]},"previous":{"title":"Database records","level":"1.5.6","depth":2,"path":"offline/database-records.md","ref":"offline/database-records.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/publications.md","mtime":"2017-05-16T14:07:28.905Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-16T18:22:33.272Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Realtime setup","level":"1.5.10","depth":2,"previous":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/realtime-setup.md","mtime":"2017-05-16T18:22:15.222Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-16T18:22:33.272Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

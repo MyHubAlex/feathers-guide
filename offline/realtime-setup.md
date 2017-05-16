@@ -1,16 +1,13 @@
 # Realtime setup
 
-## Basic setup
 
+## With server publications
 
-## Filter on the server
-
-### On the server
+##### Server code
 
 Attach hooks to each remote service:
 ```javascript
-```javascript
-const { offlineFirstBeforeHookServer } = require('feathers-mobile-enterprise/lib/server');
+const { offlineFirstBeforeHookServer } = require('feathers-mobile/lib/server');
 const { client } = require('feathers-hooks-common');
 
 module.exports = { // 'remote-service'
@@ -25,18 +22,18 @@ module.exports = { // 'remote-service'
 
 Startup server publication filters:
 ```javascript
-const { serverOfflineFirst } = require('feathers-mobile-enterprise/lib/server');
-const commonPublications = require('feathers-mobile-enterprise/lib/common/commonPublications');
+const { serverOfflineFirst } = require('feathers-mobile/lib/server');
+const commonPublications = require('feathers-mobile/lib/common/commonPublications');
 
 serverOfflineFirst(app, ['remote-service'], { publications: commonPublications });
 ```
 
 
-### On the client
+##### Client code
 
 Attach hooks to each local service:
 ```javascript
-const { offlineFirstAfterHook, offlineFirstBeforeHook } = require('feathers-mobile-enterprise');
+const { offlineFirstAfterHook, offlineFirstBeforeHook } = require('feathers-mobile');
 const { client } = require('feathers-hooks-common');
 
 module.exports = { // 'client-service'
@@ -57,8 +54,8 @@ module.exports = { // 'client-service'
 
 Configure the replication and start it:
 ```javascript
-const commonPublications = require('feathers-mobile-enterprise/lib/common/commonPublications');
-const realtime = require('feathers-mobile-enterprise/lib/realtime');
+const commonPublications = require('feathers-mobile/lib/common/commonPublications');
+const realtime = require('feathers-mobile/lib/realtime');
 
 const replicator = realtime({
   name: 'foo',
