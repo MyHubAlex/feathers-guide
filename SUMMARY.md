@@ -47,4 +47,5 @@
     * [Filtering service events](offline/filtering.md)
     * [Browsers & mobile devices](offline/browsers-mobile-devices.md)
     * [Realtime setup](offline/realtime-setup.md)
+    * [own-data setup](offline/own-data-setup.md)
     

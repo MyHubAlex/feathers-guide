@@ -786,7 +786,7 @@
 <h2 id="with-server-publications">With server publications</h2>
 <h5 id="server-code">Server code</h5>
 <p>Attach hooks to each remote service:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstBeforeHookServer } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/server&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstBeforeHookServer } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/server&apos;</span>);
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
 <span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;remote-service&apos;</span>
@@ -799,14 +799,14 @@
 };
 </code></pre>
 <p>Startup server publication filters:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { serverOfflineFirst } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/server&apos;</span>);
-<span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/common/commonPublications&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { serverOfflineFirst } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/server&apos;</span>);
+<span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
 
 serverOfflineFirst(app, [<span class="hljs-string">&apos;remote-service&apos;</span>], { publications: commonPublications });
 </code></pre>
 <h5 id="client-code">Client code</h5>
 <p>Attach hooks to each local service:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
 <span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
@@ -825,8 +825,8 @@ serverOfflineFirst(app, [<span class="hljs-string">&apos;remote-service&apos;</s
 };
 </code></pre>
 <p>Configure the replication and start it:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/common/commonPublications&apos;</span>);
-<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/realtime&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
+<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/realtime&apos;</span>);
 
 <span class="hljs-keyword">const</span> replicator = realtime({
   name: <span class="hljs-string">&apos;foo&apos;</span>,
@@ -881,7 +881,7 @@ replicator.subscribe()
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Realtime setup","level":"1.5.10","depth":2,"previous":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/realtime-setup.md","mtime":"2017-05-16T18:22:15.222Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-16T18:22:33.272Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Realtime setup","level":"1.5.10","depth":2,"previous":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/realtime-setup.md","mtime":"2017-05-16T18:26:13.838Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-16T18:29:46.472Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
