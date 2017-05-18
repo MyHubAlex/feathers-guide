@@ -292,7 +292,6 @@ Attach a hook to each local service:
 const { client } = require('feathers-hooks-common');
 module.exports = { before: { all: client('_offline') } };
 ```
-```
 
 Configure the replication, with a publication to identify the desired records, and then start it:
 ```javascript
