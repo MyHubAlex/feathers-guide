@@ -46,7 +46,6 @@
     * [Publications](offline/publications.md)
     * [Filtering service events](offline/filtering.md)
     * [Browsers & mobile devices](offline/browsers-mobile-devices.md)
-    * [Realtime setup](offline/realtime-setup.md)
-    * [Realtime examples](offline/realtime-examples.md)
-    * [own-data setup](offline/own-data-setup.md)
+    * [realtime setup](offline/realtime-setup.md)
+    * [sync-data, sync-net setup](offline/sync-setup.md)
     
