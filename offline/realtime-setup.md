@@ -167,7 +167,6 @@ module.exports = { before: { all: client('_offline') } };
 
 Configure the replication, with a publication to identify the desired records, and then start it:
 ```javascript
-// One line change from previous example
 const commonPublications = require('feathers-mobile/lib/common/commonPublications');
 const realtime = require('feathers-mobile/lib/realtime');
 
@@ -287,26 +286,12 @@ serverOfflineFirst(app, ['remote-service'], { publications: commonPublications }
 
 ##### Client code
 
-Attach hooks to each local service:
+Attach a hook to each local service:
 ```javascript
-// New code
-const { offlineFirstAfterHook, offlineFirstBeforeHook } = require('feathers-mobile');
+// No change from previous example
 const { client } = require('feathers-hooks-common');
-
-module.exports = { // 'client-service'
-  before: {
-    all: [
-      client('_offline'),
-      offlineFirstBeforeHook('foo') // We call our replicator 'foo' below.
-    ]
-  },
-
-  after: {
-    all: [
-      offlineFirstAfterHook('foo')
-    ]
-  }
-};
+module.exports = { before: { all: client('_offline') } };
+```
 ```
 
 Configure the replication, with a publication to identify the desired records, and then start it:
