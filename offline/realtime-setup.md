@@ -1,10 +1,9 @@
 # Realtime setup
 
-| **Present the code needed for realtime replication.**
+| **Let's show the code needed for the realtime strategy.**
 
 Realtime starts with a snapshot of the remote database data.
-As soon as the initial snapshot is taken,
-subsequent data changes made at the remote are delivered to the client as they occur in near real time.
+Subsequent data changes made at the remote are delivered to the client as they occur in near real time.
 The data changes are applied at the client in the same order as they occurred at the remote.
 
 Replication stops when communication is lost with the server.
@@ -30,13 +29,13 @@ app.hooks({
 
 ##### Client code
 
-Attach hook to each replicated local service:
+Attach a hook to each replicated local service:
 ```javascript
 const { client } = require('feathers-hooks-common');
 
 module.exports = { // 'client-service'
   before: {
-    all: ('_offline')
+    all: client('_offline')
   }
 };
 ```
@@ -143,15 +142,16 @@ replicator.connection.reconnected();
 
 ## Replicate part of a file
 
-The client service will contain those records on the remote service which satisfy a given criteria.
+The client service will contain those records on the remote service
+which satisfy a publication's criteria.
 All service events are emitted to the client,
-where they are checked for applicability.
+where they are checked against the publication.
 
 ##### Server code
 
 Register application-level hook.
 ```javascript
-// No change from above
+// No change from previous example
 const { client } = require('feathers-hooks-common');
 app.hooks({ before: client('_offline') });
 ```
@@ -160,14 +160,14 @@ app.hooks({ before: client('_offline') });
 
 Attach hook to each replicated local service:
 ```javascript
-// No change from above
+// No change from previous example
 const { client } = require('feathers-hooks-common');
-module.exports = { before: { all: ('_offline') } };
+module.exports = { before: { all: client('_offline') } };
 ```
 
 Configure the replication, with a publication to identify the desired records, and then start it:
 ```javascript
-// One line change from above
+// One line change from previous example
 const commonPublications = require('feathers-mobile/lib/common/commonPublications');
 const realtime = require('feathers-mobile/lib/realtime');
 
@@ -176,7 +176,9 @@ const replicator = realtime({
   app: clientApp,
   remoteServiceName: 'remote-service',
   clientServiceName: 'client-service',
-  publication: { module: commonPublications, name: 'query', params: { dept: 'a' } }, // new line
+  publication: { // new option
+    module: commonPublications, name: 'query', params: { dept: 'a'
+  },
 });
 
 replicator.subscribe()
@@ -189,15 +191,19 @@ You can run an example using this strategy.
 ```text
 cd path/to/feathers-mobile/examples
 npm install
-cd ./realtime-1
+cd ./realtime-2
 npm run build
 npm start
 ```
 Then point a browser at `localhost:3030`.
 
-A snapshot of the remote service is made to the client when replication starts.
+When replication starts,
+a snapshot of those records in the remote service which satisfy the publication
+is made to the client.
 ```javascript
-publication: { module: commonPublications, name: 'query', params: { dept: 'a' } }
+publication: {
+  module: commonPublications, name: 'query', params: { dept: 'a' }
+}
 ```
 ```text
 ===== remoteService, before mutations
@@ -250,12 +256,13 @@ The mutations are replicated to the client.
 
 The `stock: "a1"` record was removed from the client service because it no longer satisfied
 the publication after mutation.
-The `stock: "b1"` record was added as its mutation caused it to now satisfy the publication.
+The `stock: "b1"` record was added as its mutation caused it to now satisfied the publication.
 
 
 ## Filter service events on server
 
-The client service will contain those records on the remote service which satisfy a given criteria.
+The client service will contain those records on the remote service
+which satisfy a publication's criteria.
 The server determines which service events are applicable for each client,
 and only emits the relevant ones.
 
@@ -263,7 +270,7 @@ and only emits the relevant ones.
 
 Attach hooks to each remote service:
 ```javascript
-// No change from above
+// No change from previous example
 const { client } = require('feathers-hooks-common');
 app.hooks({ before: client('_offline') });
 ```
@@ -304,7 +311,7 @@ module.exports = { // 'client-service'
 
 Configure the replication, with a publication to identify the desired records, and then start it:
 ```javascript
-// One line change from above
+// One line change from previous example
 const commonPublications = require('feathers-mobile/lib/common/commonPublications');
 const realtime = require('feathers-mobile/lib/realtime');
 
@@ -330,14 +337,15 @@ You can run an example using this strategy.
 ```text
 cd path/to/feathers-mobile/examples
 npm install
-cd ./realtime-1
+cd ./realtime-3
 npm run build
 npm start
 ```
 Then point a browser at `localhost:3030`.
 
-The log for this strategy is the same as for the previous one,
-except for the server logging that it is checking the publications.
+The client log for this strategy is the same as for the previous one,
+However the server log shows that the server is now checking the publications
+and emitting only the relevant ones.
 ```text
 rep:filter --- filter patch +0ms
 rep:filter from { dept: 'a', stock: 'a1', _id: 'SOmYFH8pzebSWL6x' } +3ms
