@@ -293,7 +293,8 @@ const { client } = require('feathers-hooks-common');
 module.exports = { before: { all: client('_offline') } };
 ```
 
-Configure the replication, with a publication to identify the desired records, and then start it:
+Configure the replication, indicating the publication should be run on the server
+and that the before and after records of a mutation need to be checked:
 ```javascript
 // One line change from previous example
 const commonPublications = require('feathers-mobile/lib/common/commonPublications');
