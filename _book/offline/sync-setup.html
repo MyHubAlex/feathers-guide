@@ -961,6 +961,20 @@ The only difference is that these modules are required instead:</p>
 
 <span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-net&apos;</span>);
 </code></pre>
+<h5 id="example">Example</h5>
+<p>You can run an example using this strategy.</p>
+<pre><code class="lang-text">cd path/to/feathers-mobile/examples
+npm install
+cd ./sync-net
+npm run build
+npm start
+</code></pre>
+<p>Then point a browser at <code>localhost:3030</code>.</p>
+<p>The log will be virtually identical.
+The processing summary returned to the client will however be different.</p>
+<pre><code class="lang-text">&lt;&lt;&lt;&lt;&lt; 0 errors on reconnect
+&lt;&lt;&lt;&lt;&lt; entry 1 uuid:aa97 firstMethod:patch lastMethod:patch resolve-client
+</code></pre>
 <h2 id="replicating-with-publications-and-server-side-publications">Replicating with publications and server-side publications</h2>
 <p>Some extra code has to be added.
 Its the same as was added for the realtime strategy.</p>
@@ -1003,7 +1017,7 @@ Its the same as was added for the realtime strategy.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"previous":{"title":"realtime setup","level":"1.5.10","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-18T17:55:14.914Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T17:55:52.492Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"previous":{"title":"realtime setup","level":"1.5.10","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-18T18:04:46.195Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T18:05:00.039Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

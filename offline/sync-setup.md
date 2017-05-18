@@ -206,6 +206,26 @@ const sync = require('feathers-mobile/lib/sync-net');
 ```
 
 
+##### Example
+
+You can run an example using this strategy.
+```text
+cd path/to/feathers-mobile/examples
+npm install
+cd ./sync-net
+npm run build
+npm start
+```
+Then point a browser at `localhost:3030`.
+
+The log will be virtually identical.
+The processing summary returned to the client will however be different.
+```text
+<<<<< 0 errors on reconnect
+<<<<< entry 1 uuid:aa97 firstMethod:patch lastMethod:patch resolve-client
+```
+
+
 ## Replicating with publications and server-side publications
 
 Some extra code has to be added.
