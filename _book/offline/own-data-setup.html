@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>sync-data & sync-net · GitBook</title>
+        <title>own-data setup · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -49,10 +49,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="database-records.html" />
     
-    
-    <link rel="prev" href="owndata-ownnet.html" />
+    <link rel="prev" href="realtime-examples.html" />
     
 
     </head>
@@ -656,7 +654,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.5.5" data-path="syncdata-syncnet.html">
+        <li class="chapter " data-level="1.5.5" data-path="syncdata-syncnet.html">
             
                 <a href="syncdata-syncnet.html">
             
@@ -747,7 +745,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.12" data-path="own-data-setup.html">
+        <li class="chapter active" data-level="1.5.12" data-path="own-data-setup.html">
             
                 <a href="own-data-setup.html">
             
@@ -795,7 +793,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >sync-data & sync-net</a>
+        <a href=".." >own-data setup</a>
     </h1>
 </div>
 
@@ -810,76 +808,116 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="sync-data-and-sync-net">sync-data and sync-net</h1>
-<h2 id="what-are-the-sync-data-and-sync-net-strategies">What are the sync-data and sync-net strategies?</h2>
-<p>More complex applications may allow multiple users to mutate the same data on the remote service.
-sync-data and sync-net are similar to own-data and own-net, however they detect mutation conflicts
-and help the server resolve them.</p>
-<p>Each queue entry contains the contents of the record before the mutation.
-So each queue-entry for sync-data contains what the record contained on the client before each mutation.
-Each entry for sync-data contains what the record contained before the series of mutations.</p>
-<p>The remote service, when processing the queued entries,
-compares what the client service record contained before the mutation to what the remote service&apos;s record currently contains.</p>
-<p>If the two are the same, then the client changed a record identical to what the remote currently has.
-There is no conflict and the mutation may be performed on the remote.</p>
-<p>Let&apos;s say the user of one client device went on a plane trip and was offline for some time.
-During that time the user changed the addresses of several branch offices,
-in particular the NYC one from <code>100 Lexington</code> to <code>123 Fifth Avenue</code>.
-In the meantime another user changed the address to <code>123 5-th Ave.</code>.</p>
-<p>The queued mutations will be processed once the user reconnects after his flight.
-The only conflict to occur will be for the NYC office.
-The mutation from <code>100 Lexington</code> to <code>123 Fifth Avenue</code> conflicts with the record now being <code>123 5-th Ave.</code> on the remote service.</p>
-<p><img src="assets/sync-1a.jpg" alt="sync conflict"></p>
-<p>The remote service&apos;s <code>conflict resolver function</code> will be called with:</p>
-<ul>
-<li>the remote service&apos;s current record.</li>
-<li>the client service&apos;s method call, e.g. &apos;create&apos;, &apos;update&apos;, ...</li>
-<li>the client service&apos;s query object.</li>
-<li>the client service&apos;s before record.</li>
-<li>the record the client service wants to mutate to.</li>
-</ul>
-<p><img src="assets/sync-1b.jpg" alt="sync conflict input"></p>
-<p>The resolver may indicate:</p>
-<ul>
-<li>the current remote service&apos;s record is to be retained.</li>
-<li>the remote service&apos;s record should be mutated to the client service&apos;s record.</li>
-<li>what the contents of the record should now be.</li>
-</ul>
-<p><img src="assets/sync-1c.jpg" alt="sync conflict output"></p>
-<p>This allows the remote service great control over conflicts.
-However, in your particular use case, it may be appropriate to adapt as last-mutation-wins strategy
-and also use the client service&apos;s mutation.</p>
-<p>Other use cases may require analyzing the contents of the two records and applying business rules.</p>
-<h2 id="sometimes-own-data-is-sufficient">Sometimes own-data is sufficient</h2>
-<p>Let&apos;s say a portion of your <a href="https://en.wikipedia.org/wiki/Neighborhood_watch" target="_blank">Neighborhood Watch</a> app
-allows residents to report the location of a suspect in realtime,
-while the neighborhood waits for law enforcement to arrive.
-Your app may allow residents to update the suspect&apos;s location by using the mobile&apos;s geolocation.</p>
-<p><img src="assets/watch-1a.jpg" alt="neighborhood watch geolocation"></p>
-<p>You may decide, after assessing the application needs and legal requirements,
-to maintain only one record which contains only the suspect&apos;s latest location.
-All the residents will be updating this one record.</p>
-<p>In this use case, although many clients are updating the same record,
-you might not care about detecting mutation conflicts among the various clients.
-The app just cares about the latest sighting.</p>
-<p><img src="assets/watch-1c.jpg" alt="neighborhood watch mutations"></p>
-<p>You have two choices.</p>
-<ul>
-<li>You could use the sync-data strategy with the conflict resolver always choosing
-the client services&apos;s latest record, or</li>
-<li>You could use the own-data strategy and let the client mutations update over one another
-based solely on when the clients do the mutation.</li>
-</ul>
-<p>Whenever you decide to always use the client mutation in the conflict resolver,
-consider switching from the sync- strategy to a own- one,
-as in such cases the results are the same.</p>
-<h2 id="keep-things-simple">Keep things simple</h2>
-<p>You don&apos;t always have to choose the most sophisticated strategy.
-Its harder to reason about designs which are more sophisticated.
-There is a greater possibility of introducing errors.
-It requires a software maintainer understand more things before working with the code.
-Finally, in this case, it increases the processing load on both the server and the client. </p>
-<p>Often the best course is to choose the simplest strategy which addresses the needs.</p>
+                                <h1 id="realtime-setup">Realtime setup</h1>
+<h2 id="replicate-entire-file">Replicate entire file</h2>
+<h5 id="server-code">Server code</h5>
+<p>Register application-level hook.
+Its required for replicated remote services,
+and will not affect ones not being replicated.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>) });
+</code></pre>
+<h5 id="client-code">Client code</h5>
+<p>Attach hooks to each replicated local service:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
+<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+
+<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
+  before: {
+    all: [
+      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  },
+
+  after: {
+    all: [
+      offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  }
+};
+</code></pre>
+<p>Configure the replication and start it:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
+<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/realtime&apos;</span>);
+
+<span class="hljs-keyword">const</span> replicator = realtime({
+  name: <span class="hljs-string">&apos;foo&apos;</span>,
+  app: clientApp,
+  remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
+  clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
+  publication: {
+    <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;a&apos;</span> },
+    ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">true</span>
+  },
+});
+
+replicator.subscribe()
+  .then(() =&gt; ...)
+</code></pre>
+<h2 id="with-server-publications">With server publications</h2>
+<h5 id="server-code">Server code</h5>
+<p>Attach hooks to each remote service:
+Attach hooks to each remote service:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>) });
+</code></pre>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstBeforeHookServer } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/server&apos;</span>);
+<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+
+<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;remote-service&apos;</span>
+  before: {
+    all: [
+      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      offlineFirstBeforeHookServer() <span class="hljs-comment">// needed when checkBefore: true</span>
+    ]
+  }
+};
+</code></pre>
+<p>Startup server publication filters:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { serverOfflineFirst } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/server&apos;</span>);
+<span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
+
+serverOfflineFirst(app, [<span class="hljs-string">&apos;remote-service&apos;</span>], { publications: commonPublications });
+</code></pre>
+<h5 id="client-code">Client code</h5>
+<p>Attach hooks to each local service:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
+<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+
+<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
+  before: {
+    all: [
+      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  },
+
+  after: {
+    all: [
+      offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  }
+};
+</code></pre>
+<p>Configure the replication and start it:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
+<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/realtime&apos;</span>);
+
+<span class="hljs-keyword">const</span> replicator = realtime({
+  name: <span class="hljs-string">&apos;foo&apos;</span>,
+  app: clientApp,
+  remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
+  clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
+  publication: {
+    <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;a&apos;</span> },
+    ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">true</span>
+  },
+});
+
+replicator.subscribe()
+  .then(() =&gt; ...)
+</code></pre>
 
                                 
                                 </section>
@@ -907,14 +945,10 @@ Finally, in this case, it increases the processing load on both the server and t
 
             
                 
-                <a href="owndata-ownnet.html" class="navigation navigation-prev " aria-label="Previous page: own-data & own-net">
+                <a href="realtime-examples.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Realtime examples">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
-                
-                <a href="database-records.html" class="navigation navigation-next " aria-label="Next page: Database records">
-                    <i class="fa fa-angle-right"></i>
-                </a>
                 
             
         
@@ -923,7 +957,7 @@ Finally, in this case, it increases the processing load on both the server and t
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"sync-data & sync-net","level":"1.5.5","depth":2,"next":{"title":"Database records","level":"1.5.6","depth":2,"path":"offline/database-records.md","ref":"offline/database-records.md","articles":[]},"previous":{"title":"own-data & own-net","level":"1.5.4","depth":2,"path":"offline/owndata-ownnet.md","ref":"offline/owndata-ownnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/syncdata-syncnet.md","mtime":"2017-04-30T15:28:16.491Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T14:34:42.197Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"own-data setup","level":"1.5.12","depth":2,"previous":{"title":"Realtime examples","level":"1.5.11","depth":2,"path":"offline/realtime-examples.md","ref":"offline/realtime-examples.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/own-data-setup.md","mtime":"2017-05-17T15:33:56.783Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T14:34:42.197Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

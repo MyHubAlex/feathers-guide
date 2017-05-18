@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>sync-data & sync-net · GitBook</title>
+        <title>Realtime examples · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -49,10 +49,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="database-records.html" />
+    <link rel="next" href="own-data-setup.html" />
     
     
-    <link rel="prev" href="owndata-ownnet.html" />
+    <link rel="prev" href="realtime-setup.html" />
     
 
     </head>
@@ -656,7 +656,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.5.5" data-path="syncdata-syncnet.html">
+        <li class="chapter " data-level="1.5.5" data-path="syncdata-syncnet.html">
             
                 <a href="syncdata-syncnet.html">
             
@@ -734,7 +734,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.11" data-path="realtime-examples.html">
+        <li class="chapter active" data-level="1.5.11" data-path="realtime-examples.html">
             
                 <a href="realtime-examples.html">
             
@@ -795,7 +795,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >sync-data & sync-net</a>
+        <a href=".." >Realtime examples</a>
     </h1>
 </div>
 
@@ -810,76 +810,145 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="sync-data-and-sync-net">sync-data and sync-net</h1>
-<h2 id="what-are-the-sync-data-and-sync-net-strategies">What are the sync-data and sync-net strategies?</h2>
-<p>More complex applications may allow multiple users to mutate the same data on the remote service.
-sync-data and sync-net are similar to own-data and own-net, however they detect mutation conflicts
-and help the server resolve them.</p>
-<p>Each queue entry contains the contents of the record before the mutation.
-So each queue-entry for sync-data contains what the record contained on the client before each mutation.
-Each entry for sync-data contains what the record contained before the series of mutations.</p>
-<p>The remote service, when processing the queued entries,
-compares what the client service record contained before the mutation to what the remote service&apos;s record currently contains.</p>
-<p>If the two are the same, then the client changed a record identical to what the remote currently has.
-There is no conflict and the mutation may be performed on the remote.</p>
-<p>Let&apos;s say the user of one client device went on a plane trip and was offline for some time.
-During that time the user changed the addresses of several branch offices,
-in particular the NYC one from <code>100 Lexington</code> to <code>123 Fifth Avenue</code>.
-In the meantime another user changed the address to <code>123 5-th Ave.</code>.</p>
-<p>The queued mutations will be processed once the user reconnects after his flight.
-The only conflict to occur will be for the NYC office.
-The mutation from <code>100 Lexington</code> to <code>123 Fifth Avenue</code> conflicts with the record now being <code>123 5-th Ave.</code> on the remote service.</p>
-<p><img src="assets/sync-1a.jpg" alt="sync conflict"></p>
-<p>The remote service&apos;s <code>conflict resolver function</code> will be called with:</p>
-<ul>
-<li>the remote service&apos;s current record.</li>
-<li>the client service&apos;s method call, e.g. &apos;create&apos;, &apos;update&apos;, ...</li>
-<li>the client service&apos;s query object.</li>
-<li>the client service&apos;s before record.</li>
-<li>the record the client service wants to mutate to.</li>
-</ul>
-<p><img src="assets/sync-1b.jpg" alt="sync conflict input"></p>
-<p>The resolver may indicate:</p>
-<ul>
-<li>the current remote service&apos;s record is to be retained.</li>
-<li>the remote service&apos;s record should be mutated to the client service&apos;s record.</li>
-<li>what the contents of the record should now be.</li>
-</ul>
-<p><img src="assets/sync-1c.jpg" alt="sync conflict output"></p>
-<p>This allows the remote service great control over conflicts.
-However, in your particular use case, it may be appropriate to adapt as last-mutation-wins strategy
-and also use the client service&apos;s mutation.</p>
-<p>Other use cases may require analyzing the contents of the two records and applying business rules.</p>
-<h2 id="sometimes-own-data-is-sufficient">Sometimes own-data is sufficient</h2>
-<p>Let&apos;s say a portion of your <a href="https://en.wikipedia.org/wiki/Neighborhood_watch" target="_blank">Neighborhood Watch</a> app
-allows residents to report the location of a suspect in realtime,
-while the neighborhood waits for law enforcement to arrive.
-Your app may allow residents to update the suspect&apos;s location by using the mobile&apos;s geolocation.</p>
-<p><img src="assets/watch-1a.jpg" alt="neighborhood watch geolocation"></p>
-<p>You may decide, after assessing the application needs and legal requirements,
-to maintain only one record which contains only the suspect&apos;s latest location.
-All the residents will be updating this one record.</p>
-<p>In this use case, although many clients are updating the same record,
-you might not care about detecting mutation conflicts among the various clients.
-The app just cares about the latest sighting.</p>
-<p><img src="assets/watch-1c.jpg" alt="neighborhood watch mutations"></p>
-<p>You have two choices.</p>
-<ul>
-<li>You could use the sync-data strategy with the conflict resolver always choosing
-the client services&apos;s latest record, or</li>
-<li>You could use the own-data strategy and let the client mutations update over one another
-based solely on when the clients do the mutation.</li>
-</ul>
-<p>Whenever you decide to always use the client mutation in the conflict resolver,
-consider switching from the sync- strategy to a own- one,
-as in such cases the results are the same.</p>
-<h2 id="keep-things-simple">Keep things simple</h2>
-<p>You don&apos;t always have to choose the most sophisticated strategy.
-Its harder to reason about designs which are more sophisticated.
-There is a greater possibility of introducing errors.
-It requires a software maintainer understand more things before working with the code.
-Finally, in this case, it increases the processing load on both the server and the client. </p>
-<p>Often the best course is to choose the simplest strategy which addresses the needs.</p>
+                                <h1 id="realtime-examples">Realtime Examples</h1>
+<h2 id="replicate-the-entire-file">Replicate the entire file</h2>
+<pre><code class="lang-text">===== remoteService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;JdYINLVZkU70vcgL&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;X6ymJYOqYWLe3KHj&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;p1zZviQzhAed2jMd&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;cE9ujfWFHTjNh4px&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fyyErGpn8Hk2Q5EY&quot;}
+===== clientService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, ___id: &quot;JdYINLVZkU70vcgL&quot;, _id: &quot;A29Urf0WmOfjV8W6&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;X6ymJYOqYWLe3KHj&quot;, _id: &quot;RuZlujc09it23Ikx&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;p1zZviQzhAed2jMd&quot;, _id: &quot;Y1SuSBXUB659vEWm&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;cE9ujfWFHTjNh4px&quot;, _id: &quot;I7s4gsQTFtUZPyUt&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;fyyErGpn8Hk2Q5EY&quot;, _id: &quot;agzsMMxP04EhMksH&quot;}
+===== mutate remoteService
+remoteService.patch stock: a1
+remoteService.create stock: a99
+remoteService.remove stock: a2
+===== remoteService, after mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;JdYINLVZkU70vcgL&quot;, foo: 1}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;p1zZviQzhAed2jMd&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;cE9ujfWFHTjNh4px&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fyyErGpn8Hk2Q5EY&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, _id: &quot;1VD0hWlkfaZdDBt0&quot;}
+===== clientService, after mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, foo: 1, ___id: &quot;JdYINLVZkU70vcgL&quot;, _id: &quot;A29Urf0WmOfjV8W6&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;p1zZviQzhAed2jMd&quot;, _id: &quot;Y1SuSBXUB659vEWm&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;cE9ujfWFHTjNh4px&quot;, _id: &quot;I7s4gsQTFtUZPyUt&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;fyyErGpn8Hk2Q5EY&quot;, _id: &quot;agzsMMxP04EhMksH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, ___id: &quot;1VD0hWlkfaZdDBt0&quot;, _id: &quot;NkBp4yXfitEauNh1&quot;}
+&gt;&gt;&gt;&gt;&gt; disconnection from server
+===== mutate remoteService
+remoteService.patch stock: a3
+remoteService.create stock: a98
+remoteService.remove stock: a5
+&lt;&lt;&lt;&lt;&lt; reconnected to server
+===== remoteService, after reconnection
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;JdYINLVZkU70vcgL&quot;, foo: 1}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;p1zZviQzhAed2jMd&quot;, foo: 1}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;cE9ujfWFHTjNh4px&quot;}
+{dept: &quot;a&quot;, stock: &quot;a98&quot;, _id: &quot;zd7o0ulMagYjyGBo&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, _id: &quot;1VD0hWlkfaZdDBt0&quot;}
+===== clientService, after reconnection
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, foo: 1, ___id: &quot;JdYINLVZkU70vcgL&quot;, _id: &quot;sQ8LYLXMO2wK8VQC&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, foo: 1, ___id: &quot;p1zZviQzhAed2jMd&quot;, _id: &quot;prAZ8yJjLJw0GAfG&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;cE9ujfWFHTjNh4px&quot;, _id: &quot;1M2xDGBpQL201hfK&quot;}
+{dept: &quot;a&quot;, stock: &quot;a98&quot;, ___id: &quot;zd7o0ulMagYjyGBo&quot;, _id: &quot;DgWgc3vA8z0fewaf&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, ___id: &quot;1VD0hWlkfaZdDBt0&quot;, _id: &quot;WAFFfnvvnTDaUDwi&quot;}
+===== Example finished.
+</code></pre>
+<h2 id="replicate-part-of-a-file">Replicate part of a file</h2>
+<pre><code class="lang-text">===== remoteService, before mutations
+Object {dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;oXYki3eKCIfULIge&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;DVvUMzpEwhtLtYxg&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;k5qvFLKf7WVVr5UE&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;FqMgu80gxv1DdyHs&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;otJFp03djEuFX59R&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;lqeCPJ6k8iE2UerN&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;HEeGlMKvlPDj6K3x&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;Rab8IwKUo9s6QmK7&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;Ry81S3evrr0PEDs0&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;57cLF8GdIb9601fc&quot;}
+===== clientService, dept: a, before mutations
+Object {dept: &quot;a&quot;, stock: &quot;a1&quot;, ___id: &quot;oXYki3eKCIfULIge&quot;, _id: &quot;zNMAs3M5qVunSIhj&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;DVvUMzpEwhtLtYxg&quot;, _id: &quot;xJYNmY5NCWtDywTg&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;k5qvFLKf7WVVr5UE&quot;, _id: &quot;dDV0PDLmQFonckzj&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;FqMgu80gxv1DdyHs&quot;, _id: &quot;enSfMT2c9tGKLXFr&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;otJFp03djEuFX59R&quot;, _id: &quot;tkDySDQP5P0XTzcn&quot;}
+===== mutate remoteService
+remoteService.patch stock: a1 move to dept: b
+remoteService.patch stock: b1 move to dept: a
+===== remoteService, after mutations
+Object {dept: &quot;b&quot;, stock: &quot;a1&quot;, _id: &quot;oXYki3eKCIfULIge&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;DVvUMzpEwhtLtYxg&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;k5qvFLKf7WVVr5UE&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;FqMgu80gxv1DdyHs&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;otJFp03djEuFX59R&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;b1&quot;, _id: &quot;lqeCPJ6k8iE2UerN&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;HEeGlMKvlPDj6K3x&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;Rab8IwKUo9s6QmK7&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;Ry81S3evrr0PEDs0&quot;}
+Object {dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;57cLF8GdIb9601fc&quot;}
+===== clientService, dept a, after mutations
+Object {dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;DVvUMzpEwhtLtYxg&quot;, _id: &quot;xJYNmY5NCWtDywTg&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;k5qvFLKf7WVVr5UE&quot;, _id: &quot;dDV0PDLmQFonckzj&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;FqMgu80gxv1DdyHs&quot;, _id: &quot;enSfMT2c9tGKLXFr&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;otJFp03djEuFX59R&quot;, _id: &quot;tkDySDQP5P0XTzcn&quot;}
+Object {dept: &quot;a&quot;, stock: &quot;b1&quot;, ___id: &quot;lqeCPJ6k8iE2UerN&quot;, _id: &quot;iYgsqQbCaS9IH78p&quot;}
+===== Example finished.
+</code></pre>
+<h2 id="filter-service-events-on-server">Filter service events on server</h2>
+<pre><code class="lang-text">  rep:filter --- filter patch undefined +0ms
+  rep:filter from { dept: &apos;a&apos;, stock: &apos;a1&apos;, _id: &apos;SOmYFH8pzebSWL6x&apos; } +3ms
+  rep:filter to   { dept: &apos;b&apos;, stock: &apos;a1&apos;, _id: &apos;SOmYFH8pzebSWL6x&apos; } +3ms
+  rep:filter NEED true false +1ms
+  rep:filter --- filter patch undefined +7ms
+  rep:filter from { dept: &apos;b&apos;, stock: &apos;b1&apos;, _id: &apos;sWTybSEdfXm8NQpu&apos; } +1ms
+  rep:filter to   { dept: &apos;a&apos;, stock: &apos;b1&apos;, _id: &apos;sWTybSEdfXm8NQpu&apos; } +0ms
+  rep:filter NEED false true +1ms
+</code></pre>
+<pre><code class="lang-text">===== remoteService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;SOmYFH8pzebSWL6x&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;iS9f6izecQYDXTUX&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;2SvWXmGW1cOME41N&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;QwaWzalVrS5cazxb&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;QBP0rw2sFbi9bwOO&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;sWTybSEdfXm8NQpu&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;RIALd3j3GR2LgTwZ&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;gpn0m08rUCYO5xk1&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;9VtLgDTVi5ExZ02i&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;MEoYiMGwJDnExaIa&quot;}
+===== clientService, dept: a, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, ___id: &quot;SOmYFH8pzebSWL6x&quot;, _id: &quot;etz4iLVuJi1KgxZ9&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;iS9f6izecQYDXTUX&quot;, _id: &quot;qiMIDShK0URRrgkl&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;2SvWXmGW1cOME41N&quot;, _id: &quot;vkdFWfL5gsFkiOKz&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;QwaWzalVrS5cazxb&quot;, _id: &quot;kJ4fqU9RjDyRv8w8&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;QBP0rw2sFbi9bwOO&quot;, _id: &quot;ID5cpKOpzntTKFyJ&quot;}
+===== mutate remoteService
+remoteService.patch stock: a1 move to dept: b
+remoteService.patch stock: b1 move to dept: a
+===== remoteService, after mutations
+{dept: &quot;b&quot;, stock: &quot;a1&quot;, _id: &quot;SOmYFH8pzebSWL6x&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;iS9f6izecQYDXTUX&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;2SvWXmGW1cOME41N&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;QwaWzalVrS5cazxb&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;QBP0rw2sFbi9bwOO&quot;}
+{dept: &quot;a&quot;, stock: &quot;b1&quot;, _id: &quot;sWTybSEdfXm8NQpu&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;RIALd3j3GR2LgTwZ&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;gpn0m08rUCYO5xk1&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;9VtLgDTVi5ExZ02i&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;MEoYiMGwJDnExaIa&quot;}
+===== clientService, dept a, after mutations
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;iS9f6izecQYDXTUX&quot;, _id: &quot;qiMIDShK0URRrgkl&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;2SvWXmGW1cOME41N&quot;, _id: &quot;vkdFWfL5gsFkiOKz&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;QwaWzalVrS5cazxb&quot;, _id: &quot;kJ4fqU9RjDyRv8w8&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;QBP0rw2sFbi9bwOO&quot;, _id: &quot;ID5cpKOpzntTKFyJ&quot;}
+{dept: &quot;a&quot;, stock: &quot;b1&quot;, ___id: &quot;sWTybSEdfXm8NQpu&quot;, _id: &quot;df4m95W1Cf7uTQLI&quot;}
+===== Example finished.
+</code></pre>
 
                                 
                                 </section>
@@ -907,12 +976,12 @@ Finally, in this case, it increases the processing load on both the server and t
 
             
                 
-                <a href="owndata-ownnet.html" class="navigation navigation-prev " aria-label="Previous page: own-data & own-net">
+                <a href="realtime-setup.html" class="navigation navigation-prev " aria-label="Previous page: Realtime setup">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="database-records.html" class="navigation navigation-next " aria-label="Next page: Database records">
+                <a href="own-data-setup.html" class="navigation navigation-next " aria-label="Next page: own-data setup">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -923,7 +992,7 @@ Finally, in this case, it increases the processing load on both the server and t
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"sync-data & sync-net","level":"1.5.5","depth":2,"next":{"title":"Database records","level":"1.5.6","depth":2,"path":"offline/database-records.md","ref":"offline/database-records.md","articles":[]},"previous":{"title":"own-data & own-net","level":"1.5.4","depth":2,"path":"offline/owndata-ownnet.md","ref":"offline/owndata-ownnet.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/syncdata-syncnet.md","mtime":"2017-04-30T15:28:16.491Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T14:34:42.197Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Realtime examples","level":"1.5.11","depth":2,"next":{"title":"own-data setup","level":"1.5.12","depth":2,"path":"offline/own-data-setup.md","ref":"offline/own-data-setup.md","articles":[]},"previous":{"title":"Realtime setup","level":"1.5.10","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/realtime-examples.md","mtime":"2017-05-17T18:00:43.572Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T14:34:42.197Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

@@ -1,6 +1,6 @@
 # Realtime setup
 
-| Present the code needed for realtime replication.
+| **Present the code needed for realtime replication.**
 
 Realtime starts with a snapshot of the remote database data.
 As soon as the initial snapshot is taken,
@@ -58,7 +58,7 @@ replicator.subscribe()
 
 ##### Example
 
-You can run an example using this:
+You can run an example using this strategy.
 ```text
 cd path/to/feathers-mobile/examples
 npm install
@@ -66,7 +66,7 @@ cd ./realtime-1
 npm run build
 npm start
 ```
-and then pointing a browser at `localhost:3030`.
+Then point a browser at `localhost:3030`.
 
 A snapshot of the remote service is made to the client when replication starts.
 ```text
@@ -84,12 +84,7 @@ A snapshot of the remote service is made to the client when replication starts.
 {dept: "a", stock: "a5", ___id: "fyyErGpn8Hk2Q5EY", _id: "agzsMMxP04EhMksH"}
 ```
 
-We can simulate other people changing data on the remote service is mutated with
-```javascript
-remoteService.patch(remoteIds['a1'], { foo: 1 });
-remoteService.create({ dept: 'a', stock: 'a99' });
-remoteService.remove(remoteIds['a2']);
-```
+We can simulate other people changing data on the remote service.
 ```text
 ===== mutate remoteService
 remoteService.patch stock: a1
@@ -113,13 +108,9 @@ The mutations are replicated to the client.
 {dept: "a", stock: "a99", ___id: "1VD0hWlkfaZdDBt0", _id: "NkBp4yXfitEauNh1"}
 ```
 
-We can simulate a lost connection, during which time other people mutate more data.
+We can simulate a lost connection, after which other people mutate more data.
 ```javascript
 replicator.connection.disconnected();
-then(() => console.log('remoteService.patch stock: a3'))
-remoteService.patch(remoteIds['a3'], { foo: 1 });
-remoteService.create({ dept: 'a', stock: 'a98' });
-remoteService.remove(remoteIds['a5']);
 ```
 ```text
 >>>>> disconnection from server
@@ -192,6 +183,75 @@ replicator.subscribe()
   .then(() => ...)
 ```
 
+##### Example
+
+You can run an example using this strategy.
+```text
+cd path/to/feathers-mobile/examples
+npm install
+cd ./realtime-1
+npm run build
+npm start
+```
+Then point a browser at `localhost:3030`.
+
+A snapshot of the remote service is made to the client when replication starts.
+```javascript
+publication: { module: commonPublications, name: 'query', params: { dept: 'a' } }
+```
+```text
+===== remoteService, before mutations
+{dept: "a", stock: "a1", _id: "oXYki3eKCIfULIge"}
+{dept: "a", stock: "a2", _id: "DVvUMzpEwhtLtYxg"}
+{dept: "a", stock: "a3", _id: "k5qvFLKf7WVVr5UE"}
+{dept: "a", stock: "a4", _id: "FqMgu80gxv1DdyHs"}
+{dept: "a", stock: "a5", _id: "otJFp03djEuFX59R"}
+{dept: "b", stock: "b1", _id: "lqeCPJ6k8iE2UerN"}
+{dept: "b", stock: "b2", _id: "HEeGlMKvlPDj6K3x"}
+{dept: "b", stock: "b3", _id: "Rab8IwKUo9s6QmK7"}
+{dept: "b", stock: "b4", _id: "Ry81S3evrr0PEDs0"}
+{dept: "b", stock: "b5", _id: "57cLF8GdIb9601fc"}
+===== clientService, dept: a, before mutations
+{dept: "a", stock: "a1", ___id: "oXYki3eKCIfULIge", _id: "zNMAs3M5qVunSIhj"}
+{dept: "a", stock: "a2", ___id: "DVvUMzpEwhtLtYxg", _id: "xJYNmY5NCWtDywTg"}
+{dept: "a", stock: "a3", ___id: "k5qvFLKf7WVVr5UE", _id: "dDV0PDLmQFonckzj"}
+{dept: "a", stock: "a4", ___id: "FqMgu80gxv1DdyHs", _id: "enSfMT2c9tGKLXFr"}
+{dept: "a", stock: "a5", ___id: "otJFp03djEuFX59R", _id: "tkDySDQP5P0XTzcn"}
+```
+
+We can simulate other people changing data on the remote service.
+```text
+===== mutate remoteService
+remoteService.patch stock: a1 move to dept: b
+remoteService.patch stock: b1 move to dept: a
+```
+
+The mutations are replicated to the client.
+```text
+===== remoteService, after mutations
+{dept: "b", stock: "a1", _id: "oXYki3eKCIfULIge"}
+{dept: "a", stock: "a2", _id: "DVvUMzpEwhtLtYxg"}
+{dept: "a", stock: "a3", _id: "k5qvFLKf7WVVr5UE"}
+{dept: "a", stock: "a4", _id: "FqMgu80gxv1DdyHs"}
+{dept: "a", stock: "a5", _id: "otJFp03djEuFX59R"}
+{dept: "a", stock: "b1", _id: "lqeCPJ6k8iE2UerN"}
+{dept: "b", stock: "b2", _id: "HEeGlMKvlPDj6K3x"}
+{dept: "b", stock: "b3", _id: "Rab8IwKUo9s6QmK7"}
+{dept: "b", stock: "b4", _id: "Ry81S3evrr0PEDs0"}
+{dept: "b", stock: "b5", _id: "57cLF8GdIb9601fc"}
+===== clientService, dept a, after mutations
+{dept: "a", stock: "a2", ___id: "DVvUMzpEwhtLtYxg", _id: "xJYNmY5NCWtDywTg"}
+{dept: "a", stock: "a3", ___id: "k5qvFLKf7WVVr5UE", _id: "dDV0PDLmQFonckzj"}
+{dept: "a", stock: "a4", ___id: "FqMgu80gxv1DdyHs", _id: "enSfMT2c9tGKLXFr"}
+{dept: "a", stock: "a5", ___id: "otJFp03djEuFX59R", _id: "tkDySDQP5P0XTzcn"}
+{dept: "a", stock: "b1", ___id: "lqeCPJ6k8iE2UerN", _id: "iYgsqQbCaS9IH78p"}
+===== Example finished.
+```
+
+The `stock: "a1"` record was removed from the client service because it no longer satisfied
+the publication after mutation.
+The `stock: "b1"` record was added as its mutation caused it to now satisfy the publication.
+
 
 ## Filter service events on server
 
@@ -261,4 +321,30 @@ const replicator = realtime({
 
 replicator.subscribe()
   .then(() => ...)
+```
+
+
+##### Example
+
+You can run an example using this strategy.
+```text
+cd path/to/feathers-mobile/examples
+npm install
+cd ./realtime-1
+npm run build
+npm start
+```
+Then point a browser at `localhost:3030`.
+
+The log for this strategy is the same as for the previous one,
+except for the server logging that it is checking the publications.
+```text
+rep:filter --- filter patch +0ms
+rep:filter from { dept: 'a', stock: 'a1', _id: 'SOmYFH8pzebSWL6x' } +3ms
+rep:filter to   { dept: 'b', stock: 'a1', _id: 'SOmYFH8pzebSWL6x' } +3ms
+rep:filter NEED true false +1ms
+rep:filter --- filter patch +7ms
+rep:filter from { dept: 'b', stock: 'b1', _id: 'sWTybSEdfXm8NQpu' } +1ms
+rep:filter to   { dept: 'a', stock: 'b1', _id: 'sWTybSEdfXm8NQpu' } +0ms
+rep:filter NEED false true +1ms
 ```
