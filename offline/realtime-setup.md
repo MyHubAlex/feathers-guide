@@ -14,9 +14,9 @@ It can be restarted on reconnection.
 The client service will contain all the same records as the remote service.
 All service events are emitted to the client, because they are all required.
 
-##### Server code
+#### Server code
 
-Register application-level hook.
+Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.
 ```javascript
@@ -27,7 +27,7 @@ app.hooks({
 });
 ```
 
-##### Client code
+#### Client code
 
 Attach a hook to each replicated local service:
 ```javascript
@@ -55,7 +55,7 @@ replicator.subscribe()
   .then(() => ...)
 ```
 
-##### Example
+#### Example
 
 You can run an example using this strategy.
 ```text
@@ -147,16 +147,16 @@ which satisfy a publication's criteria.
 All service events are emitted to the client,
 where they are checked against the publication.
 
-##### Server code
+#### Server code
 
-Register application-level hook.
+Register an application-level hook.
 ```javascript
 // No change from previous example
 const { client } = require('feathers-hooks-common');
 app.hooks({ before: client('_offline') });
 ```
 
-##### Client code
+#### Client code
 
 Attach hook to each replicated local service:
 ```javascript
@@ -184,7 +184,7 @@ replicator.subscribe()
   .then(() => ...)
 ```
 
-##### Example
+#### Example
 
 You can run an example using this strategy.
 ```text
@@ -265,9 +265,9 @@ which satisfy a publication's criteria.
 The server determines which service events are applicable for each client,
 and only emits the relevant ones.
 
-##### Server code
+#### Server code
 
-Attach hooks to each remote service:
+Register an application-level hook.
 ```javascript
 // No change from previous example
 const { client } = require('feathers-hooks-common');
@@ -284,7 +284,7 @@ serverOfflineFirst(app, ['remote-service'], { publications: commonPublications }
 ```
 
 
-##### Client code
+#### Client code
 
 Attach a hook to each local service:
 ```javascript
@@ -316,7 +316,7 @@ replicator.subscribe()
 ```
 
 
-##### Example
+#### Example
 
 You can run an example using this strategy.
 ```text

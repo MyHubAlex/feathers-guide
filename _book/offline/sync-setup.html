@@ -798,19 +798,22 @@
                                 <h1 id="sync-data-sync-net-setup">Sync-data, sync-net setup</h1>
 <p>| <strong>Let&apos;s show the code needed for the sync-data and sync-net strategies.</strong></p>
 <p>Both sync strategies start with a snapshot of the remote database data.
-Subsequent data changes made at the remote are delivered to the client as they occur in near real time.
-The data changes are applied at the client in the same order as they occurred at the remote.</p>
-<p>Mutations of the client data can continue while the connection is lost.
+Subsequent data changes made at the remote are duplicated on the client as they occur in near real time.
+Data changes made on the client are likewise duplicated on the remote service.
+The data changes are applied in the same order as they occurred.</p>
+<p>Mutations of the client data can continue while disconnected.
 Since the remote service cannot be updated immediately,
 information is retained in persisted storage to await a reconnection.
-The specifics of the information retained differs between sync-data and sync-net.</p>
+The specifics of the information retained
+<a href="syncdata-syncnet.html">differs</a>
+between sync-data and sync-net.</p>
 <p>The server processes this information on reconnection.
 A user provided conflict resolver is called when a replication conflict is detected.
-This resolver decides what the record should contain.</p>
+This resolver determines what the record should contain.</p>
 <p>The client service is then brought up to data with a snapshot.</p>
 <h2 id="replicate-entire-file-using-sync-data">Replicate entire file using sync-data</h2>
-<h5 id="server-code">Server code</h5>
-<p>Register application-level hook.
+<h4 id="server-code">Server code</h4>
+<p>Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
@@ -819,16 +822,20 @@ app.hooks({
   before: client(<span class="hljs-string">&apos;_offline&apos;</span>)
 });
 </code></pre>
+<p>Configure the service that processes queued mutations on reconnection.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
   <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/optimistic-updates/sync-data/remote`</span>);
 
 app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">conflictResolver</span>(<span class="hljs-params">conflict</span>) </span>{
-  <span class="hljs-keyword">return</span> conflict.resolveUsingClient(); <span class="hljs-comment">// always use client version of record</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">conflictResolver</span>(<span class="hljs-params">{
+  remoteService, uuid, lastMethod, clientDataCurrent, clientQuery, remoteDataCurrent,
+  resolveUsingClient, resolveUsingServer, resolveManually
+}</span>) </span>{
+  <span class="hljs-keyword">return</span> resolveUsingClient(); <span class="hljs-comment">// always use client version of record</span>
 }
 </code></pre>
-<h5 id="client-code">Client code</h5>
+<h4 id="client-code">Client code</h4>
 <p>Attach hooks to each replicated local service:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
@@ -842,9 +849,7 @@ app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
   },
 
   after: {
-    all: [
-      offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
-    ]
+    all: offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
   }
 };
 </code></pre>
@@ -857,13 +862,13 @@ app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
   app: clientApp,
   remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
   clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
-  eventQueueServiceName: <span class="hljs-string">&apos;client-service-queue&apos;</span>
+  eventQueueServiceName: <span class="hljs-string">&apos;client-service-queue&apos;</span> <span class="hljs-comment">// table to persist queue</span>
 });
 
 replicator.subscribe()
   .then(() =&gt; ...)
 </code></pre>
-<h5 id="example">Example</h5>
+<h4 id="example">Example</h4>
 <p>You can run an example using this strategy.</p>
 <pre><code class="lang-text">cd path/to/feathers-mobile/examples
 npm install
@@ -897,7 +902,7 @@ clientService.patch stock: a1
 clientService.create stock: a97
 clientService.remove stock: a5
 </code></pre>
-<p>The remote and local services reflect the mutations.</p>
+<p>The remote and local services will both reflect the mutations.</p>
 <pre><code class="lang-text">===== remoteService, after mutations
 {dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, _id: &quot;fbtKHSncfOqOie0l&quot;, foo: 1&#x2026;}
 {dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, _id: &quot;fcwE2SovnTACD45d&quot;}
@@ -926,7 +931,7 @@ clientService.patch stock: a98 bar 2
 clientService.remove stock: a4
 </code></pre>
 <p><em>Notice that <code>stock: &quot;a97&quot;</code> has been changed, differently, on the client and on the server.</em></p>
-<p>After we simulate a reconnection.</p>
+<p>Now we simulate a reconnection.</p>
 <pre><code class="lang-javascript">replicator.connection.reconnected();
 </code></pre>
 <pre><code class="lang-text">&lt;&lt;&lt;&lt;&lt; reconnected to server
@@ -961,7 +966,7 @@ The only difference is that these modules are required instead:</p>
 
 <span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-net&apos;</span>);
 </code></pre>
-<h5 id="example">Example</h5>
+<h4 id="example">Example</h4>
 <p>You can run an example using this strategy.</p>
 <pre><code class="lang-text">cd path/to/feathers-mobile/examples
 npm install
@@ -1017,7 +1022,7 @@ Its the same as was added for the realtime strategy.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"previous":{"title":"realtime setup","level":"1.5.10","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-18T18:04:46.195Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T18:05:00.039Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"previous":{"title":"realtime setup","level":"1.5.10","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-18T18:32:26.178Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T18:32:40.023Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

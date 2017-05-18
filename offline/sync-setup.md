@@ -3,26 +3,29 @@
 | **Let's show the code needed for the sync-data and sync-net strategies.**
 
 Both sync strategies start with a snapshot of the remote database data.
-Subsequent data changes made at the remote are delivered to the client as they occur in near real time.
-The data changes are applied at the client in the same order as they occurred at the remote.
+Subsequent data changes made at the remote are duplicated on the client as they occur in near real time.
+Data changes made on the client are likewise duplicated on the remote service.
+The data changes are applied in the same order as they occurred.
 
-Mutations of the client data can continue while the connection is lost.
+Mutations of the client data can continue while disconnected.
 Since the remote service cannot be updated immediately,
 information is retained in persisted storage to await a reconnection.
-The specifics of the information retained differs between sync-data and sync-net.
+The specifics of the information retained
+[differs](./syncdata-syncnet.md)
+between sync-data and sync-net.
 
 The server processes this information on reconnection.
 A user provided conflict resolver is called when a replication conflict is detected.
-This resolver decides what the record should contain.
+This resolver determines what the record should contain.
 
 The client service is then brought up to data with a snapshot.
 
 
 ## Replicate entire file using sync-data
 
-##### Server code
+#### Server code
 
-Register application-level hook.
+Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.
 ```javascript
@@ -33,18 +36,22 @@ app.hooks({
 });
 ```
 
+Configure the service that processes queued mutations on reconnection.
 ```javascript
 const optimisticUpdatesRemote =
   require(`feathers-mobilde-enterprise/lib/optimistic-updates/sync-data/remote`);
   
 app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
 
-function conflictResolver(conflict) {
-  return conflict.resolveUsingClient(); // always use client version of record
+function conflictResolver({
+  remoteService, uuid, lastMethod, clientDataCurrent, clientQuery, remoteDataCurrent,
+  resolveUsingClient, resolveUsingServer, resolveManually
+}) {
+  return resolveUsingClient(); // always use client version of record
 }
 ```
 
-##### Client code
+#### Client code
 
 Attach hooks to each replicated local service:
 ```javascript
@@ -60,9 +67,7 @@ module.exports = { // 'client-service'
   },
 
   after: {
-    all: [
-      offlineFirstAfterHook('foo')
-    ]
+    all: offlineFirstAfterHook('foo')
   }
 };
 ```
@@ -77,14 +82,14 @@ const replicator = sync({
   app: clientApp,
   remoteServiceName: 'remote-service',
   clientServiceName: 'client-service',
-  eventQueueServiceName: 'client-service-queue'
+  eventQueueServiceName: 'client-service-queue' // table to persist queue
 });
 
 replicator.subscribe()
   .then(() => ...)
 ```
 
-##### Example
+#### Example
 
 You can run an example using this strategy.
 ```text
@@ -125,7 +130,7 @@ clientService.create stock: a97
 clientService.remove stock: a5
 ```
 
-The remote and local services reflect the mutations.
+The remote and local services will both reflect the mutations.
 ```text
 ===== remoteService, after mutations
 {dept: "a", stock: "a1", uuid: "aa1", _id: "fbtKHSncfOqOie0l", foo: 1…}
@@ -160,7 +165,7 @@ clientService.remove stock: a4
 
 *Notice that `stock: "a97"` has been changed, differently, on the client and on the server.*
 
-After we simulate a reconnection.
+Now we simulate a reconnection.
 ```javascript
 replicator.connection.reconnected();
 ```
@@ -206,7 +211,7 @@ const sync = require('feathers-mobile/lib/sync-net');
 ```
 
 
-##### Example
+#### Example
 
 You can run an example using this strategy.
 ```text

@@ -807,8 +807,8 @@ It can be restarted on reconnection.</p>
 <h2 id="replicate-the-entire-file">Replicate the entire file</h2>
 <p>The client service will contain all the same records as the remote service.
 All service events are emitted to the client, because they are all required.</p>
-<h5 id="server-code">Server code</h5>
-<p>Register application-level hook.
+<h4 id="server-code">Server code</h4>
+<p>Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
@@ -817,7 +817,7 @@ app.hooks({
   before: client(<span class="hljs-string">&apos;_offline&apos;</span>)
 });
 </code></pre>
-<h5 id="client-code">Client code</h5>
+<h4 id="client-code">Client code</h4>
 <p>Attach a hook to each replicated local service:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
@@ -840,7 +840,7 @@ app.hooks({
 replicator.subscribe()
   .then(() =&gt; ...)
 </code></pre>
-<h5 id="example">Example</h5>
+<h4 id="example">Example</h4>
 <p>You can run an example using this strategy.</p>
 <pre><code class="lang-text">cd path/to/feathers-mobile/examples
 npm install
@@ -915,13 +915,13 @@ remoteService.remove stock: a5
 which satisfy a publication&apos;s criteria.
 All service events are emitted to the client,
 where they are checked against the publication.</p>
-<h5 id="server-code">Server code</h5>
-<p>Register application-level hook.</p>
+<h4 id="server-code">Server code</h4>
+<p>Register an application-level hook.</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// No change from previous example</span>
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>) });
 </code></pre>
-<h5 id="client-code">Client code</h5>
+<h4 id="client-code">Client code</h4>
 <p>Attach hook to each replicated local service:</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// No change from previous example</span>
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
@@ -944,7 +944,7 @@ app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>
 replicator.subscribe()
   .then(() =&gt; ...)
 </code></pre>
-<h5 id="example">Example</h5>
+<h4 id="example">Example</h4>
 <p>You can run an example using this strategy.</p>
 <pre><code class="lang-text">cd path/to/feathers-mobile/examples
 npm install
@@ -1011,8 +1011,8 @@ The <code>stock: &quot;b1&quot;</code> record was added as its mutation caused i
 which satisfy a publication&apos;s criteria.
 The server determines which service events are applicable for each client,
 and only emits the relevant ones.</p>
-<h5 id="server-code">Server code</h5>
-<p>Attach hooks to each remote service:</p>
+<h4 id="server-code">Server code</h4>
+<p>Register an application-level hook.</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// No change from previous example</span>
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>) });
@@ -1024,7 +1024,7 @@ app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>
 
 serverOfflineFirst(app, [<span class="hljs-string">&apos;remote-service&apos;</span>], { publications: commonPublications });
 </code></pre>
-<h5 id="client-code">Client code</h5>
+<h4 id="client-code">Client code</h4>
 <p>Attach a hook to each local service:</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// No change from previous example</span>
 <span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
@@ -1050,7 +1050,7 @@ and that the before and after records of a mutation need to be checked:</p>
 replicator.subscribe()
   .then(() =&gt; ...)
 </code></pre>
-<h5 id="example">Example</h5>
+<h4 id="example">Example</h4>
 <p>You can run an example using this strategy.</p>
 <pre><code class="lang-text">cd path/to/feathers-mobile/examples
 npm install
@@ -1114,7 +1114,7 @@ rep:filter NEED false true +1ms
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"realtime setup","level":"1.5.10","depth":2,"next":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"path":"offline/sync-setup.md","ref":"offline/sync-setup.md","articles":[]},"previous":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/realtime-setup.md","mtime":"2017-05-18T15:25:02.099Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T18:05:00.039Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"realtime setup","level":"1.5.10","depth":2,"next":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"path":"offline/sync-setup.md","ref":"offline/sync-setup.md","articles":[]},"previous":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/realtime-setup.md","mtime":"2017-05-18T18:17:46.571Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T18:32:40.023Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
