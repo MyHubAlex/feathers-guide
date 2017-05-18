@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>own-data setup · GitBook</title>
+        <title>sync-data, sync-net setup · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -50,7 +50,7 @@
 
     
     
-    <link rel="prev" href="realtime-examples.html" />
+    <link rel="prev" href="realtime-setup.html" />
     
 
     </head>
@@ -724,7 +724,7 @@
                 <a href="realtime-setup.html">
             
                     
-                    Realtime setup
+                    realtime setup
             
                 </a>
             
@@ -732,25 +732,12 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.11" data-path="realtime-examples.html">
+        <li class="chapter active" data-level="1.5.11" data-path="sync-setup.html">
             
-                <a href="realtime-examples.html">
-            
-                    
-                    Realtime examples
-            
-                </a>
-            
-
-            
-        </li>
-    
-        <li class="chapter active" data-level="1.5.12" data-path="own-data-setup.html">
-            
-                <a href="own-data-setup.html">
+                <a href="sync-setup.html">
             
                     
-                    own-data setup
+                    sync-data, sync-net setup
             
                 </a>
             
@@ -793,7 +780,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >own-data setup</a>
+        <a href=".." >sync-data, sync-net setup</a>
     </h1>
 </div>
 
@@ -808,14 +795,38 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="realtime-setup">Realtime setup</h1>
-<h2 id="replicate-entire-file">Replicate entire file</h2>
+                                <h1 id="sync-data-sync-net-setup">Sync-data, sync-net setup</h1>
+<p>| <strong>Let&apos;s show the code needed for the sync-data and sync-net strategies.</strong></p>
+<p>Both sync strategies start with a snapshot of the remote database data.
+Subsequent data changes made at the remote are delivered to the client as they occur in near real time.
+The data changes are applied at the client in the same order as they occurred at the remote.</p>
+<p>Mutations of the client data can continue while the connection is lost.
+Since the remote service cannot be updated immediately,
+information is retained in persisted storage to await a reconnection.
+The specifics of the information retained differs between sync-data and sync-net.</p>
+<p>The server processes this information on reconnection.
+A user provided conflict resolver is called when a replication conflict is detected.
+This resolver decides what the record should contain.</p>
+<p>The client service is then brought up to data with a snapshot.</p>
+<h2 id="replicate-entire-file-using-sync-data">Replicate entire file using sync-data</h2>
 <h5 id="server-code">Server code</h5>
 <p>Register application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
-app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>) });
+
+app.hooks({
+  before: client(<span class="hljs-string">&apos;_offline&apos;</span>)
+});
+</code></pre>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/optimistic-updates/sync-data/remote`</span>);
+
+app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">conflictResolver</span>(<span class="hljs-params">conflict</span>) </span>{
+  <span class="hljs-keyword">return</span> conflict.resolveUsingClient(); <span class="hljs-comment">// always use client version of record</span>
+}
 </code></pre>
 <h5 id="client-code">Client code</h5>
 <p>Attach hooks to each replicated local service:</p>
@@ -839,85 +850,120 @@ app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>
 </code></pre>
 <p>Configure the replication and start it:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/realtime&apos;</span>);
+<span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-data&apos;</span>);
 
-<span class="hljs-keyword">const</span> replicator = realtime({
+<span class="hljs-keyword">const</span> replicator = sync({
   name: <span class="hljs-string">&apos;foo&apos;</span>,
   app: clientApp,
   remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
   clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
-  publication: {
-    <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;a&apos;</span> },
-    ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">true</span>
-  },
+  eventQueueServiceName: <span class="hljs-string">&apos;client-service-queue&apos;</span>
 });
 
 replicator.subscribe()
   .then(() =&gt; ...)
 </code></pre>
-<h2 id="with-server-publications">With server publications</h2>
-<h5 id="server-code">Server code</h5>
-<p>Attach hooks to each remote service:
-Attach hooks to each remote service:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
-app.hooks({ before: client(<span class="hljs-string">&apos;_offline&apos;</span>) });
+<h5 id="example">Example</h5>
+<p>You can run an example using this strategy.</p>
+<pre><code class="lang-text">cd path/to/feathers-mobile/examples
+npm install
+cd ./sync-data
+npm run build
+npm start
 </code></pre>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstBeforeHookServer } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/server&apos;</span>);
-<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
-
-<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;remote-service&apos;</span>
-  before: {
-    all: [
-      client(<span class="hljs-string">&apos;_offline&apos;</span>),
-      offlineFirstBeforeHookServer() <span class="hljs-comment">// needed when checkBefore: true</span>
-    ]
-  }
-};
+<p>Then point a browser at <code>localhost:3030</code>.</p>
+<p>A snapshot of the remote service is made to the client when replication starts.</p>
+<pre><code class="lang-text">===== remoteService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, _id: &quot;fbtKHSncfOqOie0l&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, uuid: &quot;aa2&quot;, _id: &quot;QN9ugaxOlqwLRb4A&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, _id: &quot;fcwE2SovnTACD45d&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, _id: &quot;Eoi0lyr1GxWyAZoC&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, uuid: &quot;aa5&quot;, _id: &quot;isoXUR6OpjjHQVQF&quot;}
+===== clientService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, ___id: &quot;fbtKHSncfOqOie0l&quot;, _id: &quot;ixFV8jPcVmWFUESy&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, uuid: &quot;aa2&quot;, ___id: &quot;QN9ugaxOlqwLRb4A&quot;, _id: &quot;FtgYKaU2ujbu9T7F&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, ___id: &quot;fcwE2SovnTACD45d&quot;, _id: &quot;W4tHWgYht6AsPj4w&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, ___id: &quot;Eoi0lyr1GxWyAZoC&quot;, _id: &quot;TCEYbaLq1d7yWUV2&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, uuid: &quot;aa5&quot;, ___id: &quot;isoXUR6OpjjHQVQF&quot;, _id: &quot;ihS9go5yAsCbZ5fm&quot;}
 </code></pre>
-<p>Startup server publication filters:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { serverOfflineFirst } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/server&apos;</span>);
-<span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-
-serverOfflineFirst(app, [<span class="hljs-string">&apos;remote-service&apos;</span>], { publications: commonPublications });
+<p>We can simulate someone mutating the remote service,
+while we mutate the client service.</p>
+<pre><code class="lang-text">===== mutate remoteService
+remoteService.patch stock: a1
+remoteService.create stock: a99
+remoteService.remove stock: a2
+===== mutate clientService
+clientService.patch stock: a1
+clientService.create stock: a97
+clientService.remove stock: a5
 </code></pre>
-<h5 id="client-code">Client code</h5>
-<p>Attach hooks to each local service:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
-<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
-
-<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
-  before: {
-    all: [
-      client(<span class="hljs-string">&apos;_offline&apos;</span>),
-      offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
-    ]
-  },
-
-  after: {
-    all: [
-      offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
-    ]
-  }
-};
+<p>The remote and local services reflect the mutations.</p>
+<pre><code class="lang-text">===== remoteService, after mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, _id: &quot;fbtKHSncfOqOie0l&quot;, foo: 1&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, _id: &quot;fcwE2SovnTACD45d&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, _id: &quot;Eoi0lyr1GxWyAZoC&quot;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, _id: &quot;GqiM9KOwlKMUsV6p&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, _id: &quot;6pIT67zaQwE73fuq&quot;}
+===== clientService, after mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, foo: 1, bar: 1&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, ___id: &quot;fcwE2SovnTACD45d&quot;, _id: &quot;W4tHWgYht6AsPj4w&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, ___id: &quot;Eoi0lyr1GxWyAZoC&quot;, _id: &quot;TCEYbaLq1d7yWUV2&quot;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, ___id: &quot;GqiM9KOwlKMUsV6p&quot;, _id: &quot;kLWR0BN4r6ZQYIJA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, ___id: &quot;6pIT67zaQwE73fuq&quot;, _id: &quot;XRTauC0tncI1DoRu&quot;}
 </code></pre>
-<p>Configure the replication and start it:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-<span class="hljs-keyword">const</span> realtime = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/realtime&apos;</span>);
-
-<span class="hljs-keyword">const</span> replicator = realtime({
-  name: <span class="hljs-string">&apos;foo&apos;</span>,
-  app: clientApp,
-  remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
-  clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
-  publication: {
-    <span class="hljs-built_in">module</span>: commonPublications, name: <span class="hljs-string">&apos;query&apos;</span>, params: { dept: <span class="hljs-string">&apos;a&apos;</span> },
-    ifServer: <span class="hljs-literal">true</span>, checkBefore: <span class="hljs-literal">true</span>
-  },
-});
-
-replicator.subscribe()
-  .then(() =&gt; ...)
+<p>We can simulate a lost connection, after which we mutate the client data,
+while others mutate the remote service data.</p>
+<pre><code class="lang-javascript">replicator.connection.disconnected();
 </code></pre>
+<pre><code class="lang-text">&gt;&gt;&gt;&gt;&gt; disconnection from server
+===== mutations
+clientService.patch stock: a3 bar: 1
+clientService.patch stock: a3 bar: 2
+clientService.patch stock: a97 bar: 1
+remoteService.patch stock: a97 bux: 0
+clientService.create stock: a98
+clientService.patch stock: a98 bar 2
+clientService.remove stock: a4
+</code></pre>
+<p><em>Notice that <code>stock: &quot;a97&quot;</code> has been changed, differently, on the client and on the server.</em></p>
+<p>After we simulate a reconnection.</p>
+<pre><code class="lang-javascript">replicator.connection.reconnected();
+</code></pre>
+<pre><code class="lang-text">&lt;&lt;&lt;&lt;&lt; reconnected to server
+</code></pre>
+<p>The mutations that were queued on the client are sent to the server,
+which updates the remote service while resolving any conflicts.
+A summary of that processing is returned to the client.</p>
+<pre><code class="lang-text">&lt;&lt;&lt;&lt;&lt; 0 errors on reconnect
+&lt;&lt;&lt;&lt;&lt; entry 2 uuid:aa97 method:patch resolve-client
+&lt;&lt;&lt;&lt;&lt; entry 4 uuid:aa98 method:patch resolve-client
+</code></pre>
+<p>The client service is then brought up to data with a snapshot.</p>
+<pre><code class="lang-text">===== remoteService, after reconnection
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, _id: &quot;fbtKHSncfOqOie0l&quot;, foo: 1&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, _id: &quot;fcwE2SovnTACD45d&quot;, bar: 2}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, _id: &quot;GqiM9KOwlKMUsV6p&quot;, bux: 0&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a98&quot;, uuid: &quot;aa98&quot;, _id: &quot;Kp5mGQHqg6UHn2L2&quot;, bar: 2}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, _id: &quot;6pIT67zaQwE73fuq&quot;}
+===== clientService, after reconnection
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, foo: 1, bar: 1&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, bar: 2, ___id: &quot;fcwE2SovnTACD45d&quot;&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, bux: 0, bar: 1&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a98&quot;, uuid: &quot;aa98&quot;, bar: 2, ___id: &quot;Kp5mGQHqg6UHn2L2&quot;&#x2026;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, ___id: &quot;6pIT67zaQwE73fuq&quot;, _id: &quot;RfaOetDt53LY2YAG&quot;}
+===== Example finished.
+</code></pre>
+<h2 id="replicate-entire-file-using-sync-net">Replicate entire file using sync-net</h2>
+<p>The code for sync-net is almost identical to that for sync-data.
+The only difference is that these modules are required instead:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/optimistic-updates/sync-net/remote`</span>);
+
+<span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-net&apos;</span>);
+</code></pre>
+<h2 id="replicating-with-publications-and-server-side-publications">Replicating with publications and server-side publications</h2>
+<p>Some extra code has to be added.
+Its the same as was added for the realtime strategy.</p>
 
                                 
                                 </section>
@@ -945,7 +991,7 @@ replicator.subscribe()
 
             
                 
-                <a href="realtime-examples.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Realtime examples">
+                <a href="realtime-setup.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: realtime setup">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
@@ -957,7 +1003,7 @@ replicator.subscribe()
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"own-data setup","level":"1.5.12","depth":2,"previous":{"title":"Realtime examples","level":"1.5.11","depth":2,"path":"offline/realtime-examples.md","ref":"offline/realtime-examples.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/own-data-setup.md","mtime":"2017-05-17T15:33:56.783Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T15:25:13.940Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.11","depth":2,"previous":{"title":"realtime setup","level":"1.5.10","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-18T17:55:14.914Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-18T17:55:52.492Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
