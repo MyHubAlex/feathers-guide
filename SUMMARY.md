@@ -48,5 +48,6 @@
     * [Browsers & mobile devices](offline/browsers-mobile-devices.md)
     * [snapshot setup](offline/snapshot-setup.md)
     * [realtime setup](offline/realtime-setup.md)
+    * [own-data, own-net setup](offline/own-setup.md)
     * [sync-data, sync-net setup](offline/sync-setup.md)
     

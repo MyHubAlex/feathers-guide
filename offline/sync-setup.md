@@ -1,4 +1,4 @@
-# Sync-data, sync-net setup
+# sync-data, sync-net setup
 
 | **Let's show the code needed for the sync-data and sync-net strategies.**
 

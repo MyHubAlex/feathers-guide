@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>snapshot · GitBook</title>
+        <title>own-data, own-net setup · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -49,10 +49,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="realtime.html" />
+    <link rel="next" href="sync-setup.html" />
     
     
-    <link rel="prev" href="strategies.html" />
+    <link rel="prev" href="realtime-setup.html" />
     
 
     </head>
@@ -617,7 +617,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.5.2" data-path="snapshot.html">
+        <li class="chapter " data-level="1.5.2" data-path="snapshot.html">
             
                 <a href="snapshot.html">
             
@@ -747,7 +747,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.12" data-path="own-setup.html">
+        <li class="chapter active" data-level="1.5.12" data-path="own-setup.html">
             
                 <a href="own-setup.html">
             
@@ -808,7 +808,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >snapshot</a>
+        <a href=".." >own-data, own-net setup</a>
     </h1>
 </div>
 
@@ -823,62 +823,171 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="snapshot">Snapshot</h1>
-<h2 id="what-is-the-snapshot-strategy">What is the Snapshot strategy?</h2>
-<p>Snapshot distributes data exactly as it appears at a specific moment in time and does not monitor for updates to the data.
-When synchronization occurs, the entire snapshot is generated and sent to client service.</p>
+                                <h1 id="data--net-setup">-data, -net setup</h1>
 <blockquote>
-<p>Snapshot can be used by itself, but the snapshot process is also commonly used to provide the initial set of data for all the other strategies.</p>
+<p><strong>In progress. Don&apos;t read.</strong></p>
 </blockquote>
-<p>Using Snapshot by itself is most appropriate when one or more of the following is true:</p>
-<ul>
-<li>Data changes infrequently.</li>
-<li>It is acceptable to have copies of data that are out of date with respect to the rempte service for a period of time.</li>
-<li>Replicating small or medium volumes of data.</li>
-<li>A large volume of changes occurs over a short period of time.</li>
-<li>Keep the current values after having lost connection for some time.</li>
-</ul>
-<p>Snapshot replication is most appropriate when data changes are substantial but infrequent.
-For example, if a sales organization maintains a product price list and the prices are all updated at the same time once or twice each year,
-replicating the entire snapshot of data after it has changed is recommended.
-Given certain types of data, more frequent snapshots may also be appropriate.
-For example, if a relatively small table is updated on a remote service during the day,
-but some latency is acceptable, changes can be delivered nightly as a snapshot.</p>
-<p>Snapshot has a lower continuous overhead on both the client and the remote than the other strategies,
-because incremental changes are not tracked.
-However, if the dataset set is very large,
-it will require substantial resources to generate and apply the snapshot.
-Consider the size of the entire data set and the frequency of changes to the data when evaluating whether to utilize snapshot replication.</p>
-<p>(*)</p>
-<h2 id="snapshot-case-study">Snapshot Case Study</h2>
-<p>Let&apos;s consider a mobile application for movie cinemas, which lists show times.</p>
-<p><img src="assets/snapshot-2a.jpg" alt="Cinema panels"></p>
-<p>Let&apos;s assess the data problem.</p>
-<ul>
-<li>Cinemas change once a year.</li>
-<li>The schedule changes every Thursday.</li>
-<li>The static information rarely changes.</li>
-<li>We need to support ticket reservations.</li>
-<li>We don&apos;t need past data.</li>
-</ul>
-<p>Let&apos;s look at the data. We need:</p>
-<ul>
-<li>12 cimema photos + their names + coordinates</li>
-<li>25 film posters + film names</li>
-<li>30 movie times for each cinemas</li>
-</ul>
-<p>This is about 7k of files and 2M of photos, which takes less space than 1 Facebook photo.</p>
-<p>The problem definition contains the solution:</p>
-<p><img src="assets/snapshot-2d.jpg" alt="Cinema flowchart"></p>
-<p>The snapshot strategy is the simplest one to satisfy the needs.</p>
-<p>How about ticket reservations? You got to do some things online!
-However, you can still give a telephone number.</p>
-<p>(**)</p>
-<h4 id="sources">Sources:</h4>
-<ul>
-<li>(*) <a href="https://docs.microsoft.com/en-us/sql/relational-databases/replication/snapshot-replication" target="_blank">Microsoft</a></li>
-<li>(**) <a href="https://www.slideshare.net/MarinTodorov/overcome-your-fear-of-implementing-offline-mode-in-your-apps?next_slideshow=1" target="_blank">MarinTodorov</a></li>
-</ul>
+<p>| <strong>Let&apos;s show the code needed for the sync-data and sync-net strategies.</strong></p>
+<p>Both * strategies start with a snapshot of the remote database data.
+Subsequent data changes made at the remote are duplicated on the client as they occur in near real time.
+Data changes made on the client are likewise duplicated on the remote service.
+The data changes are applied in the same order as they occurred.</p>
+<p>Mutations of the client data can continue while disconnected.
+Since the remote service cannot be updated immediately,
+information is retained in persisted storage to await a reconnection.
+The specifics of the information retained
+<a href="data-net.md">differs</a>
+between -data and -net.</p>
+<p>The server processes this information on reconnection.
+There is no conflict detection.</p>
+<p>The client service is then brought up to data with a snapshot.</p>
+<h2 id="replicate-entire-file-using--data">Replicate entire file using -data</h2>
+<h4 id="server-code">Server code</h4>
+<p>Register an application-level hook.
+Its required for replicated remote services,
+and will not affect ones not being replicated.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+
+app.hooks({
+  before: client(<span class="hljs-string">&apos;_offline&apos;</span>)
+});
+</code></pre>
+<h4 id="client-code">Client code</h4>
+<p>Attach hooks to each replicated local service:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
+<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+
+<span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
+  before: {
+    all: [
+      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
+    ]
+  },
+
+  after: {
+    all: offlineFirstAfterHook(<span class="hljs-string">&apos;foo&apos;</span>)
+  }
+};
+</code></pre>
+<p>Configure the replication and start it:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
+<span class="hljs-keyword">const</span>  = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/-data&apos;</span>);
+
+<span class="hljs-keyword">const</span> replicator = ({
+  name: <span class="hljs-string">&apos;foo&apos;</span>,
+  app: clientApp,
+  remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
+  clientServiceName: <span class="hljs-string">&apos;client-service&apos;</span>,
+  eventQueueServiceName: <span class="hljs-string">&apos;client-service-queue&apos;</span> <span class="hljs-comment">// table to persist queue</span>
+});
+
+replicator.subscribe()
+  .then(() =&gt; ...)
+</code></pre>
+<h4 id="example">Example</h4>
+<p>You can run an example using this strategy.</p>
+<pre><code class="lang-text">cd path/to/feathers-mobile/examples
+npm install
+cd ./-data
+npm run build
+npm start
+</code></pre>
+<p>Then point a browser at <code>localhost:3030</code>.</p>
+<p>A snapshot of the remote service is made to the client when replication starts.</p>
+<pre><code class="lang-text">===== remoteService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, _id: &quot;kTCqEW4ONbbT6jD9&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, uuid: &quot;aa2&quot;, _id: &quot;8xEdaDaBf5R5VIon&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, _id: &quot;1J3kfm2Uw0q5vCXr&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, _id: &quot;6XzxML6No7WN9yO1&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, uuid: &quot;aa5&quot;, _id: &quot;30O1fG51SYNx7VLh&quot;}
+===== clientService, before mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, ___id: &quot;kTCqEW4ONbbT6jD9&quot;, _id: &quot;b6Do9mf7hjN77D18&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, uuid: &quot;aa2&quot;, ___id: &quot;8xEdaDaBf5R5VIon&quot;, _id: &quot;QP5vNtdFWRrxIPeT&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, ___id: &quot;1J3kfm2Uw0q5vCXr&quot;, _id: &quot;NMDZ3ZlLBsruPyLl&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, ___id: &quot;6XzxML6No7WN9yO1&quot;, _id: &quot;ES77JjX2jVm5kj7v&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, uuid: &quot;aa5&quot;, ___id: &quot;30O1fG51SYNx7VLh&quot;, _id: &quot;zMXiwkOws1G2SjIr&quot;}
+</code></pre>
+<p>We can simulate someone mutating the remote service,
+while we mutate the client service.</p>
+<pre><code class="lang-text">===== mutate remoteService
+remoteService.patch stock: a1
+remoteService.create stock: a99
+remoteService.remove stock: a2
+===== mutate clientService
+clientService.patch stock: a1
+clientService.create stock: a97
+clientService.remove stock: a5
+</code></pre>
+<p>The remote and local services will both reflect the mutations.</p>
+<pre><code class="lang-text">{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, foo: 1, bar: 1, _id: &quot;Zwbub2UvJ6XMv6ou&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, _id: &quot;jumjhw7I9nHmCBhf&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, _id: &quot;dakpnAb9NKNqbq1f&quot;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, _id: &quot;IxahXM4WycU2SYsE&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, _id: &quot;jgF5J0AWGHGSN7PO&quot;}
+===== clientService, after mutations
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, foo: 1, bar: 1, ___id: &quot;Zwbub2UvJ6XMv6ou&quot;, _id: &quot;zSukLc1iUqdrFKMv&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, ___id: &quot;jumjhw7I9nHmCBhf&quot;, _id: &quot;3pf0NyUQjGDpIa0x&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, uuid: &quot;aa4&quot;, ___id: &quot;dakpnAb9NKNqbq1f&quot;, _id: &quot;1TzP01wsXsgxrJOO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, ___id: &quot;IxahXM4WycU2SYsE&quot;, _id: &quot;cEuT6lSPbUw2zek2&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, ___id: &quot;jgF5J0AWGHGSN7PO&quot;, _id: &quot;kYlWWiIxjpZc7krr&quot;}
+</code></pre>
+<p>We can simulate a lost connection, after which we mutate the client data,
+while others mutate the remote service data.</p>
+<pre><code class="lang-javascript">replicator.connection.disconnected();
+</code></pre>
+<pre><code class="lang-text">&gt;&gt;&gt;&gt;&gt; disconnection from server
+2-reconnect.js:22 ===== mutate clientService
+2-reconnect.js:23 clientService.patch stock: a3 bar: 1
+2-reconnect.js:25 clientService.patch stock: a3 bar: 2
+2-reconnect.js:27 clientService.create stock: a98
+2-reconnect.js:30 clientService.patch stock: a98 bar 2
+2-reconnect.js:32 clientService.remove stock: a4
+</code></pre>
+<p><em>Notice that <code>stock: &quot;a97&quot;</code> has been changed, differently, on the client and on the server.</em></p>
+<p>Now we simulate a reconnection.</p>
+<pre><code class="lang-javascript">replicator.connection.reconnected();
+</code></pre>
+<pre><code class="lang-text">&lt;&lt;&lt;&lt;&lt; reconnected to server
+</code></pre>
+<p>The mutations that were queued on the client are sent to the server,
+which updates the remote service while resolving any conflicts.
+A summary of that processing is returned to the client.</p>
+<pre><code class="lang-text">&lt;&lt;&lt;&lt;&lt; 0 errors on reconnect
+</code></pre>
+<p>The client service is then brought up to data with a snapshot.</p>
+<pre><code class="lang-text">===== remoteService, after reconnection
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, foo: 1, bar:1, _id: &quot;Zwbub2UvJ6XMv6ou&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, bar: 2, _id: &quot;jumjhw7I9nHmCBhf&quot;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, _id: &quot;IxahXM4WycU2SYsE&quot;}
+{dept: &quot;a&quot;, stock: &quot;a98&quot;, uuid: &quot;aa98&quot;, bar: 2, _id: &quot;XhMctGnojPHpCaHQ&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, _id: &quot;jgF5J0AWGHGSN7PO&quot;}
+===== clientService, after reconnection
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, uuid: &quot;aa1&quot;, foo: 1, bar: 1, ___id: &quot;Zwbub2UvJ6XMv6ou&quot;, _id: &quot;dcaNMeMhwg0CC1dI&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, uuid: &quot;aa3&quot;, bar: 2, ___id: &quot;jumjhw7I9nHmCBhf&quot;, _id: &quot;m5GEeSYtsRHozYyD&quot;}
+{dept: &quot;a&quot;, stock: &quot;a97&quot;, uuid: &quot;aa97&quot;, ___id: &quot;IxahXM4WycU2SYsE&quot;, _id: &quot;gkIoafTxizRYi0rm&quot;}
+{dept: &quot;a&quot;, stock: &quot;a98&quot;, uuid: &quot;aa98&quot;, bar: 2, ___id: &quot;XhMctGnojPHpCaHQ&quot;, _id: &quot;QCpHcA73CHwSnXGK&quot;}
+{dept: &quot;a&quot;, stock: &quot;a99&quot;, uuid: &quot;aa99&quot;, ___id: &quot;jgF5J0AWGHGSN7PO&quot;, _id: &quot;XpS5M9SdlhEny5h4&quot;}
+===== Example finished.
+</code></pre>
+<h2 id="replicate-entire-file-using-own-net">Replicate entire file using own-net</h2>
+<p>The code for own-net is almost identical to that for own-data.
+The only difference is that this module is required instead:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> own = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/own-net&apos;</span>);
+</code></pre>
+<h4 id="example">Example</h4>
+<p>You can run an example using this strategy.</p>
+<pre><code class="lang-text">cd path/to/feathers-mobile/examples
+npm install
+cd ./own-net
+npm run build
+npm start
+</code></pre>
+<p>Then point a browser at <code>localhost:3030</code>.</p>
+<p>The log will be identical.</p>
+<h2 id="replicating-with-publications-and-server-side-publications">Replicating with publications and server-side publications</h2>
+<p>Some extra code has to be added.
+Its the same as was added for the realtime strategy.</p>
 
                                 
                                 </section>
@@ -906,12 +1015,12 @@ However, you can still give a telephone number.</p>
 
             
                 
-                <a href="strategies.html" class="navigation navigation-prev " aria-label="Previous page: Strategies">
+                <a href="realtime-setup.html" class="navigation navigation-prev " aria-label="Previous page: realtime setup">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="realtime.html" class="navigation navigation-next " aria-label="Next page: realtime">
+                <a href="sync-setup.html" class="navigation navigation-next " aria-label="Next page: sync-data, sync-net setup">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -922,7 +1031,7 @@ However, you can still give a telephone number.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"snapshot","level":"1.5.2","depth":2,"next":{"title":"realtime","level":"1.5.3","depth":2,"path":"offline/realtime.md","ref":"offline/realtime.md","articles":[]},"previous":{"title":"Strategies","level":"1.5.1","depth":2,"path":"offline/strategies.md","ref":"offline/strategies.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/snapshot.md","mtime":"2017-04-29T10:58:06.331Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-19T19:24:05.429Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"own-data, own-net setup","level":"1.5.12","depth":2,"next":{"title":"sync-data, sync-net setup","level":"1.5.13","depth":2,"path":"offline/sync-setup.md","ref":"offline/sync-setup.md","articles":[]},"previous":{"title":"realtime setup","level":"1.5.11","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/own-setup.md","mtime":"2017-05-19T19:23:42.110Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-19T19:24:05.429Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
