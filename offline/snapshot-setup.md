@@ -2,9 +2,8 @@
 
 | **Let's show the code needed for the snapshot strategy.**
 
-Snapshot distributes data exactly as it appears at a specific moment in time
-and does not monitor for updates to the data.
-When synchronization occurs, the entire snapshot is generated and sent to client service.
+Snapshot replicates data as of a specific moment in time
+and does not monitor for subsequent updates.
 
 ## Read entire file using snapshot
 
