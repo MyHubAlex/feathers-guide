@@ -46,6 +46,7 @@
     * [Publications](offline/publications.md)
     * [Filtering service events](offline/filtering.md)
     * [Browsers & mobile devices](offline/browsers-mobile-devices.md)
+    * [snapshot setup](offline/snapshot-setup.md)
     * [realtime setup](offline/realtime-setup.md)
     * [sync-data, sync-net setup](offline/sync-setup.md)
     

@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Offline · GitBook</title>
+        <title>snapshot setup · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -49,10 +49,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="strategies.html" />
+    <link rel="next" href="realtime-setup.html" />
     
     
-    <link rel="prev" href="../adapters/redux-auth/readme.html" />
+    <link rel="prev" href="browsers-mobile-devices.html" />
     
 
     </head>
@@ -590,7 +590,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.5" data-path="readme.html">
+        <li class="chapter " data-level="1.5" data-path="readme.html">
             
                 <a href="readme.html">
             
@@ -721,7 +721,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.10" data-path="snapshot-setup.html">
+        <li class="chapter active" data-level="1.5.10" data-path="snapshot-setup.html">
             
                 <a href="snapshot-setup.html">
             
@@ -795,7 +795,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Offline</a>
+        <a href=".." >snapshot setup</a>
     </h1>
 </div>
 
@@ -810,66 +810,145 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="offline-first">Offline First</h1>
-<h2 id="the-landscape">The Landscape</h2>
-<p>Customers are increasingly purchasing goods and services using smartphones, either through native or web applications. And, they want to make these purchases wherever they may be, whether it&#x2019;s inside trains, in the countryside or roaming in foreign countries.</p>
-<p>However, mobile networks are still known to be unreliable. Even in highly covered areas and with modern networks, you still encounter high latency and network failure rates. But it&#x2019;s not just the network at fault here: the customer experience for failure rates also depends on how a given application deals with being offline.</p>
-<p>In one extreme end of the quality spectrum, you have an application that, when a network error occurs, the application presents the user with a crude error message and no clue of how to recover.</p>
-<p><img src="assets/no-connection-1.jpg" alt="no connection"></p>
-<p>On the opposite end of the spectrum are applications that automatically deal with network failures &#x2014; this is the good end of the spectrum.</p>
-<p><img src="assets/snapshot-4e.jpg" alt="offline panel"></p>
-<p>(*)</p>
-<h2 id="what-is-offline-first">What is Offline First?</h2>
-<p>Offline first is a way of building applications where having network connectivity is an enhancement, not a necessity. Instead of building applications with the always-on desktop mindset, when you build applications in which the default mode is offline, you&#x2019;re prone to deliver a better overall customer experience.</p>
-<p>Offline-first techniques and technologies exist to prepare an application to deliver a good experience to customers while it&#x2019;s offline.</p>
-<p>(*)</p>
-<h2 id="client-has-local-data">Client has Local Data</h2>
-<p>The only way that an application can access data while it&#x2019;s offline is, of course, to store that data locally.</p>
-<p>Your application prefers reading from the local source, while that local data is updated from remote sources.</p>
-<h2 id="the-first-generation-of-offline-first-">The First Generation of Offline First (*)</h2>
-<p>Some database technologies exist that work on the client side. SQLite is the reference of embeddable databases and it&#x2019;s often used on native applications. In the web realm, PouchDB offers a document store on top of the storage the browser offers. PouchDB also has some nice features &#x2014;  it can sync with a back-end CouchDB server, Cloudant, a PouchDB Node.js server or any other database that implements the CouchDB replication protocol.</p>
-<p>In this architecture, each client has its own dedicated database, which is then replicated to a dedicated database on the back-end. Each database may then contain the customer documents. (A document is a JSON object that may contain any arbitrary data).</p>
-<p>One database per customer may sound strange to people who are used to relational databases, but it&#x2019;s a usual pattern when using CouchDB and variants. It&#x2019;s also a way to clearly and naturally separate and enforce which data a user has access to.</p>
-<p>When a change happens on the client or on the server, the sync protocol kicks in and tries to replicate that change to the other side. If no network connection is possible at that time, the client will try to reconnect. Once a connection is possible, both databases will be able to talk to each other and synchronize.</p>
-<p>In this architecture, both the client and the server can make changes to the data concurrently. If a conflict arises for a given document, the replication protocol makes sure that both databases converge to the same version of that document. When a conflict happens, Pouch and CouchDB keep all the conflict data around. If the programmer so wishes, they can solve that conflict with any strategy they deem correct and that minimizes data loss.</p>
-<p>(*)</p>
-<h2 id="issues">Issues</h2>
-<p>One database per customer is logically reasonable for many mobile applications as customers don&apos;t interact in such applications.
-However a successful application may end up having thousands of databases, one for each of its thousands of customers.
-You can use tools, such as those provided by IBM, which maintain only one database but makes it look like many individual CouchDB databases.</p>
-<p>A second issue is that the remote and local databases synchronize by replication.
-The only way to make replication realtime is to start a synchronization cycle every time any data changes on either the remote of the local database.
-This is a lot of overhead especially on the server.</p>
-<h2 id="feathers-offline-first">Feathers Offline First</h2>
-<p>Feathers has unique foundational features which are useful for implementing offline-first.</p>
-<p>First, local applications can easily mutate remote databases.
-This means we can add a hook to a local database so that, whenever it is locally mutated, the hook can optimistically mutate the remote database.</p>
-<p><img src="assets/service-diagram-basic.jpg" alt="services"></p>
-<p>Second, local applications know when a remote database is mutated as that mutation emits a Feathers realtime event on the client.</p>
-<p><img src="assets/realtime-events-flow.jpg" alt="realtime events"></p>
-<p>Feathers Offline First therefore reacts in realtime when connected, employing a replication strategy only when disconnected.
-This makes applications using it less sluggish.</p>
-<p>Importantly, Feathers Offline First allows a client database to reflect only a portion of the remote database.
-So information for all customers can reside in one database, with each client seeing only those items its allowed to.</p>
-<h2 id="no-universal-solution">No universal solution</h2>
-<p>There is no one universal solution to implementing offline first. The end.</p>
-<p>For each application, you have to:</p>
-<ul>
-<li>assess the problem</li>
-<li>determine the correct solution</li>
-<li>implement the right code</li>
-</ul>
-<blockquote>
-<p>In this order please!</p>
-</blockquote>
-<p>Many mobile applications only need a read-only local database which is infrequently refreshed.
-Why would you implement a complex replication strategy in such cases?</p>
-<p>Feathers Offline First provides several strategies for implementing offline first.
-Determine your application&apos;s needs and then choose the simplest strategy which satisfies them.</p>
-<h4 id="sources">Sources:</h4>
-<ul>
-<li>(*) <a href="https://thenewstack.io/build-better-customer-experience-applications-using-offline-first-principles/" target="_blank">Pedro Teixeira</a></li>
-</ul>
+                                <h1 id="snapshot-setup">snapshot setup</h1>
+<p>| <strong>Let&apos;s show the code needed for the snapshot strategy.</strong></p>
+<p>Snapshot distributes data exactly as it appears at a specific moment in time
+and does not monitor for updates to the data.
+When synchronization occurs, the entire snapshot is generated and sent to client service.</p>
+<h2 id="read-entire-file-using-snapshot">Read entire file using snapshot</h2>
+<h4 id="client-code">Client code</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { readService } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/snapshot&apos;</span>);
+<span class="hljs-keyword">const</span> remoteService = clientApp.service(<span class="hljs-string">&apos;remote-service&apos;</span>);
+
+readService(remoteService)
+  .then(result =&gt; ...)
+</code></pre>
+<h4 id="example">Example</h4>
+<p>You can run an example using this strategy.</p>
+<pre><code class="lang-text">cd path/to/feathers-mobile/examples
+npm install
+cd ./snapshot
+npm run build
+npm start
+</code></pre>
+<p>Then point a browser at <code>localhost:3030</code>.</p>
+<p>The entire file is read.</p>
+<pre><code class="lang-text">===== Read remoteService service directly
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;3NoUsKVqAjcQNb1j&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;ORz3YqSqGqPV18zO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;EcWIiNJXnQJD9AcA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;zkkBvGxeto2DNlHH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fbDONG4MgbTl4VQO&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;jEkLYt9hmBEQtVB2&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;k6ORo68NIrI9aoyk&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;KUY40fNyghvFuRsm&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;DKUjyUxmaaahNpG7&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;JJY4W7kEmE6shnwf&quot;}
+===== readService, all records
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;3NoUsKVqAjcQNb1j&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;ORz3YqSqGqPV18zO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;EcWIiNJXnQJD9AcA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;zkkBvGxeto2DNlHH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fbDONG4MgbTl4VQO&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;jEkLYt9hmBEQtVB2&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;k6ORo68NIrI9aoyk&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;KUY40fNyghvFuRsm&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;DKUjyUxmaaahNpG7&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;JJY4W7kEmE6shnwf&quot;}
+</code></pre>
+<h2 id="read-selected-records-using-snapshot">Read selected records using snapshot</h2>
+<h4 id="client-code">Client code</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { readService } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/snapshot&apos;</span>);
+<span class="hljs-keyword">const</span> remoteService = clientApp.service(<span class="hljs-string">&apos;remote-service&apos;</span>);
+
+readService(remoteService, { selection: { dept: <span class="hljs-string">&apos;a&apos;</span> } })
+  .then(result =&gt; ...)
+</code></pre>
+<p><code>selection</code> may also be a function, i.e. <code>data =&gt; data.dept === &apos;a&apos;</code>.</p>
+<h4 id="example">Example</h4>
+<p>The above example also runs this strategy, reading part of the file.</p>
+<pre><code class="lang-text">===== Read remoteService service directly
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;3NoUsKVqAjcQNb1j&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;ORz3YqSqGqPV18zO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;EcWIiNJXnQJD9AcA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;zkkBvGxeto2DNlHH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fbDONG4MgbTl4VQO&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;jEkLYt9hmBEQtVB2&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;k6ORo68NIrI9aoyk&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;KUY40fNyghvFuRsm&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;DKUjyUxmaaahNpG7&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;JJY4W7kEmE6shnwf&quot;}
+===== readService, dept: &apos;a&apos;
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;3NoUsKVqAjcQNb1j&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;ORz3YqSqGqPV18zO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;EcWIiNJXnQJD9AcA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;zkkBvGxeto2DNlHH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fbDONG4MgbTl4VQO&quot;}
+</code></pre>
+<h2 id="copy-entire-file-using-snapshot">Copy entire file using snapshot</h2>
+<h4 id="client-code">Client code</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { copyService } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/snapshot&apos;</span>);
+<span class="hljs-keyword">const</span> remoteService = clientApp.service(<span class="hljs-string">&apos;remote-service&apos;</span>);
+<span class="hljs-keyword">const</span> clientService = clientApp.service(<span class="hljs-string">&apos;local-service&apos;</span>);
+
+copyService(remoteService, clientService)
+  .then(() =&gt; clientService.find())
+</code></pre>
+<h4 id="example">Example</h4>
+<p>The above example also runs this strategy, copying the file to clientService.</p>
+<pre><code class="lang-text">===== Read remoteService service directly
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;3NoUsKVqAjcQNb1j&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;ORz3YqSqGqPV18zO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;EcWIiNJXnQJD9AcA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;zkkBvGxeto2DNlHH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fbDONG4MgbTl4VQO&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;jEkLYt9hmBEQtVB2&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;k6ORo68NIrI9aoyk&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;KUY40fNyghvFuRsm&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;DKUjyUxmaaahNpG7&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;JJY4W7kEmE6shnwf&quot;}
+===== copyService, all records
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, ___id: &quot;3NoUsKVqAjcQNb1j&quot;, _id: &quot;7QvQUj0WOuy3rYtt&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;ORz3YqSqGqPV18zO&quot;, _id: &quot;GlEVuJSLH9Kytj5z&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;EcWIiNJXnQJD9AcA&quot;, _id: &quot;2yzDs8Qri77bAJeV&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;zkkBvGxeto2DNlHH&quot;, _id: &quot;PTnKe31IGss8ajOv&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;fbDONG4MgbTl4VQO&quot;, _id: &quot;dYiyoidcU1WiPjPN&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, ___id: &quot;jEkLYt9hmBEQtVB2&quot;, _id: &quot;CkpXPS7sIswhYBXe&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, ___id: &quot;k6ORo68NIrI9aoyk&quot;, _id: &quot;wwRteg1iWgahOu8b&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, ___id: &quot;KUY40fNyghvFuRsm&quot;, _id: &quot;TSSt3UhdGb0dZKLK&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, ___id: &quot;DKUjyUxmaaahNpG7&quot;, _id: &quot;CPKM8gynyKf7pFQ0&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, ___id: &quot;JJY4W7kEmE6shnwf&quot;, _id: &quot;fSHbQ5BqEpkgR36y&quot;}
+</code></pre>
+<h2 id="copy-selected-records-using-snapshot">Copy selected records using snapshot</h2>
+<h4 id="client-code">Client code</h4>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { copyService } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/snapshot&apos;</span>);
+<span class="hljs-keyword">const</span> remoteService = clientApp.service(<span class="hljs-string">&apos;remote-service&apos;</span>);
+<span class="hljs-keyword">const</span> clientService = clientApp.service(<span class="hljs-string">&apos;local-service&apos;</span>);
+
+copyService(remoteService, clientService, { selection: { dept: <span class="hljs-string">&apos;a&apos;</span> } })
+  .then(() =&gt; clientService.find())
+</code></pre>
+<p><code>selection</code> may also be a function, i.e. <code>data =&gt; data.dept === &apos;a&apos;</code>.</p>
+<h4 id="example">Example</h4>
+<p>The above example also runs this strategy, copying part of the file to clientService.</p>
+<pre><code class="lang-text">===== Read remoteService service directly
+{dept: &quot;a&quot;, stock: &quot;a1&quot;, _id: &quot;3NoUsKVqAjcQNb1j&quot;}
+{dept: &quot;a&quot;, stock: &quot;a2&quot;, _id: &quot;ORz3YqSqGqPV18zO&quot;}
+{dept: &quot;a&quot;, stock: &quot;a3&quot;, _id: &quot;EcWIiNJXnQJD9AcA&quot;}
+{dept: &quot;a&quot;, stock: &quot;a4&quot;, _id: &quot;zkkBvGxeto2DNlHH&quot;}
+{dept: &quot;a&quot;, stock: &quot;a5&quot;, _id: &quot;fbDONG4MgbTl4VQO&quot;}
+{dept: &quot;b&quot;, stock: &quot;b1&quot;, _id: &quot;jEkLYt9hmBEQtVB2&quot;}
+{dept: &quot;b&quot;, stock: &quot;b2&quot;, _id: &quot;k6ORo68NIrI9aoyk&quot;}
+{dept: &quot;b&quot;, stock: &quot;b3&quot;, _id: &quot;KUY40fNyghvFuRsm&quot;}
+{dept: &quot;b&quot;, stock: &quot;b4&quot;, _id: &quot;DKUjyUxmaaahNpG7&quot;}
+{dept: &quot;b&quot;, stock: &quot;b5&quot;, _id: &quot;JJY4W7kEmE6shnwf&quot;}
+===== copyService, dept: `a`
+clientService{dept: &quot;a&quot;, stock: &quot;a1&quot;, ___id: &quot;3NoUsKVqAjcQNb1j&quot;, _id: &quot;ERpGR3WP2f2cRu7q&quot;}
+clientService{dept: &quot;a&quot;, stock: &quot;a2&quot;, ___id: &quot;ORz3YqSqGqPV18zO&quot;, _id: &quot;uXIplOWf3FKgTO9t&quot;}
+clientService{dept: &quot;a&quot;, stock: &quot;a3&quot;, ___id: &quot;EcWIiNJXnQJD9AcA&quot;, _id: &quot;KOfEu7JWmfsdHY6t&quot;}
+clientService{dept: &quot;a&quot;, stock: &quot;a4&quot;, ___id: &quot;zkkBvGxeto2DNlHH&quot;, _id: &quot;xj68YAy49PH59eiR&quot;}
+clientService{dept: &quot;a&quot;, stock: &quot;a5&quot;, ___id: &quot;fbDONG4MgbTl4VQO&quot;, _id: &quot;Dx7GWlIeEBNWsnjk&quot;}
+</code></pre>
 
                                 
                                 </section>
@@ -897,12 +976,12 @@ Determine your application&apos;s needs and then choose the simplest strategy wh
 
             
                 
-                <a href="../adapters/redux-auth/readme.html" class="navigation navigation-prev " aria-label="Previous page: Redux for Feathers authentication >>">
+                <a href="browsers-mobile-devices.html" class="navigation navigation-prev " aria-label="Previous page: Browsers & mobile devices">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="strategies.html" class="navigation navigation-next " aria-label="Next page: Strategies">
+                <a href="realtime-setup.html" class="navigation navigation-next " aria-label="Next page: realtime setup">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -913,7 +992,7 @@ Determine your application&apos;s needs and then choose the simplest strategy wh
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Offline","level":"1.5","depth":1,"next":{"title":"Strategies","level":"1.5.1","depth":2,"path":"offline/strategies.md","ref":"offline/strategies.md","articles":[]},"previous":{"title":"Redux for Feathers authentication >>","level":"1.4.2","depth":2,"path":"adapters/redux-auth/readme.md","ref":"adapters/redux-auth/readme.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/readme.md","mtime":"2017-04-29T10:58:06.250Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-19T13:07:53.508Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"snapshot setup","level":"1.5.10","depth":2,"next":{"title":"realtime setup","level":"1.5.11","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"previous":{"title":"Browsers & mobile devices","level":"1.5.9","depth":2,"path":"offline/browsers-mobile-devices.md","ref":"offline/browsers-mobile-devices.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/snapshot-setup.md","mtime":"2017-05-19T13:07:27.575Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-19T13:07:53.508Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
