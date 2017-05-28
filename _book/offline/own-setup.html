@@ -841,26 +841,32 @@ between -data and -net.</p>
 <p>The server processes this information on reconnection.
 There is no conflict detection.</p>
 <p>The client service is then brought up to data with a snapshot.</p>
-<h2 id="replicate-entire-file-using--data">Replicate entire file using -data</h2>
+<h2 id="replicate-entire-file-using-own-data">Replicate entire file using own-data</h2>
 <h4 id="server-code">Server code</h4>
 <p>Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { paramsFromClient} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
 app.hooks({
-  before: client(<span class="hljs-string">&apos;_offline&apos;</span>)
+  before: paramsFromClient(<span class="hljs-string">&apos;_offline&apos;</span>)
 });
+</code></pre>
+<p>Configure the service that processes queued mutations on reconnection.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobile/lib/server/own-data`</span>);
+
+app.configure(optimisticUpdatesRemote.service());
 </code></pre>
 <h4 id="client-code">Client code</h4>
 <p>Attach hooks to each replicated local service:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
-<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+<span class="hljs-keyword">const</span> { paramsFromClient } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
 <span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
   before: {
     all: [
-      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      paramsFromClient(<span class="hljs-string">&apos;_offline&apos;</span>),
       offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
     ]
   },
@@ -871,10 +877,9 @@ app.hooks({
 };
 </code></pre>
 <p>Configure the replication and start it:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-<span class="hljs-keyword">const</span>  = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/-data&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> own = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/own-data&apos;</span>);
 
-<span class="hljs-keyword">const</span> replicator = ({
+<span class="hljs-keyword">const</span> replicator = own({
   name: <span class="hljs-string">&apos;foo&apos;</span>,
   app: clientApp,
   remoteServiceName: <span class="hljs-string">&apos;remote-service&apos;</span>,
@@ -889,7 +894,7 @@ replicator.subscribe()
 <p>You can run an example using this strategy.</p>
 <pre><code class="lang-text">cd path/to/feathers-mobile/examples
 npm install
-cd ./-data
+cd ./own-data
 npm run build
 npm start
 </code></pre>
@@ -972,8 +977,13 @@ A summary of that processing is returned to the client.</p>
 </code></pre>
 <h2 id="replicate-entire-file-using-own-net">Replicate entire file using own-net</h2>
 <p>The code for own-net is almost identical to that for own-data.
-The only difference is that this module is required instead:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> own = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/own-net&apos;</span>);
+The only difference is that these modules are required instead:</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobile/lib/server/own-own`</span>);
+
+<span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
+
+<span class="hljs-keyword">const</span> own = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile-enterprise/lib/own-net&apos;</span>);
 </code></pre>
 <h4 id="example">Example</h4>
 <p>You can run an example using this strategy.</p>
@@ -1031,7 +1041,7 @@ Its the same as was added for the realtime strategy.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"own-data, own-net setup","level":"1.5.12","depth":2,"next":{"title":"sync-data, sync-net setup","level":"1.5.13","depth":2,"path":"offline/sync-setup.md","ref":"offline/sync-setup.md","articles":[]},"previous":{"title":"realtime setup","level":"1.5.11","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/own-setup.md","mtime":"2017-05-19T19:23:42.110Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-19T19:24:05.429Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"own-data, own-net setup","level":"1.5.12","depth":2,"next":{"title":"sync-data, sync-net setup","level":"1.5.13","depth":2,"path":"offline/sync-setup.md","ref":"offline/sync-setup.md","articles":[]},"previous":{"title":"realtime setup","level":"1.5.11","depth":2,"path":"offline/realtime-setup.md","ref":"offline/realtime-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/own-setup.md","mtime":"2017-05-28T21:06:40.526Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-28T21:11:22.710Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

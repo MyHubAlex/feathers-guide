@@ -842,15 +842,15 @@ This resolver determines what the record should contain.</p>
 <p>Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { paramsFromClient } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
 app.hooks({
-  before: client(<span class="hljs-string">&apos;_offline&apos;</span>)
+  before: paramsFromClient(<span class="hljs-string">&apos;_offline&apos;</span>)
 });
 </code></pre>
 <p>Configure the service that processes queued mutations on reconnection.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
-  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/optimistic-updates/sync-data/remote`</span>);
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/server/sync-data`</span>);
 
 app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
 
@@ -864,12 +864,12 @@ app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
 <h4 id="client-code">Client code</h4>
 <p>Attach hooks to each replicated local service:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> { offlineFirstAfterHook, offlineFirstBeforeHook } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile&apos;</span>);
-<span class="hljs-keyword">const</span> { client } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
+<span class="hljs-keyword">const</span> { paramsFromClient } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-hooks-common&apos;</span>);
 
 <span class="hljs-built_in">module</span>.exports = { <span class="hljs-comment">// &apos;client-service&apos;</span>
   before: {
     all: [
-      client(<span class="hljs-string">&apos;_offline&apos;</span>),
+      paramsFromClient(<span class="hljs-string">&apos;_offline&apos;</span>),
       offlineFirstBeforeHook(<span class="hljs-string">&apos;foo&apos;</span>)
     ]
   },
@@ -880,8 +880,7 @@ app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
 };
 </code></pre>
 <p>Configure the replication and start it:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> commonPublications = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/common/commonPublications&apos;</span>);
-<span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-data&apos;</span>);
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-data&apos;</span>);
 
 <span class="hljs-keyword">const</span> replicator = sync({
   name: <span class="hljs-string">&apos;foo&apos;</span>,
@@ -988,7 +987,7 @@ A summary of that processing is returned to the client.</p>
 <p>The code for sync-net is almost identical to that for sync-data.
 The only difference is that these modules are required instead:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> optimisticUpdatesRemote =
-  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/optimistic-updates/sync-net/remote`</span>);
+  <span class="hljs-built_in">require</span>(<span class="hljs-string">`feathers-mobilde-enterprise/lib/server/sync-net`</span>);
 
 <span class="hljs-keyword">const</span> sync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;feathers-mobile/lib/sync-net&apos;</span>);
 </code></pre>
@@ -1048,7 +1047,7 @@ Its the same as was added for the realtime strategy.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.13","depth":2,"previous":{"title":"own-data, own-net setup","level":"1.5.12","depth":2,"path":"offline/own-setup.md","ref":"offline/own-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-19T18:36:53.075Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-19T19:24:05.429Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"sync-data, sync-net setup","level":"1.5.13","depth":2,"previous":{"title":"own-data, own-net setup","level":"1.5.12","depth":2,"path":"offline/own-setup.md","ref":"offline/own-setup.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["feathers-collapsible-menu","heading-anchors","include-codeblock"],"pluginsConfig":{"search":{},"lunr":{"maxIndexSize":1000000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"heading-anchors":{},"highlight":{},"include-codeblock":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"feathers-collapsible-menu":{}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css"}},"file":{"path":"offline/sync-setup.md","mtime":"2017-05-28T21:10:47.473Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-05-28T21:11:22.710Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

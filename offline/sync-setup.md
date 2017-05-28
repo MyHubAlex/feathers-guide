@@ -29,17 +29,18 @@ Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.
 ```javascript
-const { client } = require('feathers-hooks-common');
+const { paramsFromClient } = require('feathers-hooks-common');
 
 app.hooks({
-  before: client('_offline')
+  before: paramsFromClient('_offline')
 });
 ```
 
 Configure the service that processes queued mutations on reconnection.
+
 ```javascript
 const optimisticUpdatesRemote =
-  require(`feathers-mobilde-enterprise/lib/optimistic-updates/sync-data/remote`);
+  require(`feathers-mobilde-enterprise/lib/server/sync-data`);
   
 app.configure(optimisticUpdatesRemote.service({ conflictResolver }));
 
@@ -54,14 +55,15 @@ function conflictResolver({
 #### Client code
 
 Attach hooks to each replicated local service:
+
 ```javascript
 const { offlineFirstAfterHook, offlineFirstBeforeHook } = require('feathers-mobile');
-const { client } = require('feathers-hooks-common');
+const { paramsFromClient } = require('feathers-hooks-common');
 
 module.exports = { // 'client-service'
   before: {
     all: [
-      client('_offline'),
+      paramsFromClient('_offline'),
       offlineFirstBeforeHook('foo')
     ]
   },
@@ -74,7 +76,6 @@ module.exports = { // 'client-service'
 
 Configure the replication and start it:
 ```javascript
-const commonPublications = require('feathers-mobile/lib/common/commonPublications');
 const sync = require('feathers-mobile/lib/sync-data');
 
 const replicator = sync({
@@ -205,7 +206,7 @@ The code for sync-net is almost identical to that for sync-data.
 The only difference is that these modules are required instead:
 ```javascript
 const optimisticUpdatesRemote =
-  require(`feathers-mobilde-enterprise/lib/optimistic-updates/sync-net/remote`);
+  require(`feathers-mobilde-enterprise/lib/server/sync-net`);
 
 const sync = require('feathers-mobile/lib/sync-net');
 ```

@@ -22,7 +22,7 @@ There is no conflict detection.
 The client service is then brought up to data with a snapshot.
 
 
-## Replicate entire file using -data
+## Replicate entire file using own-data
 
 #### Server code
 
@@ -30,24 +30,33 @@ Register an application-level hook.
 Its required for replicated remote services,
 and will not affect ones not being replicated.
 ```javascript
-const { client } = require('feathers-hooks-common');
+const { paramsFromClient} = require('feathers-hooks-common');
 
 app.hooks({
-  before: client('_offline')
+  before: paramsFromClient('_offline')
 });
 ```
+
+Configure the service that processes queued mutations on reconnection.
+```javascript
+const optimisticUpdatesRemote =
+  require(`feathers-mobile/lib/server/own-data`);
+  
+app.configure(optimisticUpdatesRemote.service());
+```
+
 
 #### Client code
 
 Attach hooks to each replicated local service:
 ```javascript
 const { offlineFirstAfterHook, offlineFirstBeforeHook } = require('feathers-mobile');
-const { client } = require('feathers-hooks-common');
+const { paramsFromClient } = require('feathers-hooks-common');
 
 module.exports = { // 'client-service'
   before: {
     all: [
-      client('_offline'),
+      paramsFromClient('_offline'),
       offlineFirstBeforeHook('foo')
     ]
   },
@@ -60,10 +69,9 @@ module.exports = { // 'client-service'
 
 Configure the replication and start it:
 ```javascript
-const commonPublications = require('feathers-mobile/lib/common/commonPublications');
-const  = require('feathers-mobile/lib/-data');
+const own = require('feathers-mobile/lib/own-data');
 
-const replicator = ({
+const replicator = own({
   name: 'foo',
   app: clientApp,
   remoteServiceName: 'remote-service',
@@ -81,7 +89,7 @@ You can run an example using this strategy.
 ```text
 cd path/to/feathers-mobile/examples
 npm install
-cd ./-data
+cd ./own-data
 npm run build
 npm start
 ```
@@ -183,9 +191,14 @@ The client service is then brought up to data with a snapshot.
 ## Replicate entire file using own-net
 
 The code for own-net is almost identical to that for own-data.
-The only difference is that this module is required instead:
+The only difference is that these modules are required instead:
 ```javascript
-const own = require('feathers-mobile/lib/own-net');
+const optimisticUpdatesRemote =
+  require(`feathers-mobile/lib/server/own-own`);
+  
+const { offlineFirstAfterHook, offlineFirstBeforeHook } = require('feathers-mobile');
+
+const own = require('feathers-mobile-enterprise/lib/own-net');
 ```
 
 
