@@ -77,7 +77,7 @@ and it makes frontend development significantly simpler.
 The results in the console window of the browser are the same as they were
 running [Writing a Database Connector](./database-connector.md).
 
-```text`
+```text
 created Jane Doe item
  Object {email: "jane.doe@gmail.com", password: "11111", role: "admin", _id: "8zQ7mXay3XqiqP35"}
 created John Doe item
